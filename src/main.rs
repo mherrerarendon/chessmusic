@@ -3,14 +3,15 @@
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
-    let resp = reqwest::get("https://lichess.org/game/export/tzUJbFEX?clocks=false&evals=false").await?;
-    println!("Status: {}", resp.status());
+    let game = get_game(String::from("tzUJbFEX")).await?; 
 
-    let body = resp.text().await?;
-    println!("Body:\n\n{}", body);
+    println!("Game:\n\n{}", game);
     Ok(())
 }
 
-// async fn get_game(game_id: u32) -> Result<str, reqwest::Error> {
-//     Ok("test")
-// }
+async fn get_game(game_id: String) -> Result<String, reqwest::Error> {
+    let url = format!("https://lichess.org/game/export/{}?clocks=false&evals=false", game_id);
+    let response = reqwest::get(&url).await?;
+    let body = response.text().await?;
+    Ok(body)
+}
