@@ -1,11 +1,15 @@
-use std::error::Error;
+use std::{error::Error, vec};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let game = get_game(String::from("tzUJbFEX")).await?; 
     println!("Game:\n\n{}", game);
+
     let moves = get_moves(&game)?;
     println!("Moves:\n\n{}", moves);
+
+    let parsed_moves = parse_moves(&moves)?;
+    println!("Parsed moves:\n\n{:?}", parsed_moves);
     Ok(())
 }
 
@@ -26,4 +30,9 @@ fn get_moves(game: &String) -> Result<String, Box<dyn Error>> {
     let mut iter = lines.filter(|&line| (*line).starts_with("1"));
     let moves = iter.next().unwrap();
     Ok(String::from(moves))
+}
+
+fn parse_moves(game: &String) -> Result<Vec<String>, Box<dyn Error>> {
+
+    Ok(vec!["test".to_string()])
 }
