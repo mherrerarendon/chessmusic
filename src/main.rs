@@ -1,38 +1,18 @@
+mod lichess;
+mod pgn;
+
 use std::{error::Error, vec};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let game = get_game(String::from("tzUJbFEX")).await?; 
+    let game = lichess::get_game(String::from("tzUJbFEX")).await?; 
     println!("Game:\n\n{}", game);
 
-    let moves = get_moves(&game)?;
+    let moves = pgn::get_moves(&game)?;
     println!("Moves:\n\n{}", moves);
 
-    let parsed_moves = parse_moves(&moves)?;
+    let parsed_moves = pgn::parse_moves(&moves)?;
     println!("Parsed moves:\n\n{:?}", parsed_moves);
     Ok(())
 }
 
-async fn get_game(game_id: String) -> Result<String, Box<dyn Error>> {
-    let url = format!("https://lichess.org/game/export/{}?clocks=false&evals=false", game_id);
-    let response = reqwest::get(&url).await?;
-    let success = response.status().is_success();
-    if !success {
-        println!("Request was not successful.");
-        Err("Bad request")?;
-    }
-    let body = response.text().await?;
-    Ok(body)
-}
-
-fn get_moves(game: &String) -> Result<String, Box<dyn Error>> {
-    let lines = game.lines();
-    let mut iter = lines.filter(|&line| (*line).starts_with("1"));
-    let moves = iter.next().unwrap();
-    Ok(String::from(moves))
-}
-
-fn parse_moves(game: &String) -> Result<Vec<String>, Box<dyn Error>> {
-
-    Ok(vec!["test".to_string()])
-}
