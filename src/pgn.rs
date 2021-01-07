@@ -1,8 +1,4 @@
-// #[macro_use] extern crate lazy_static;
-// extern crate regex;
-use regex::Regex;
-
-use std::{error::Error, vec};
+use std::{error::Error};
 
 // get_moves returns a vector where each element is a vector of length 2. These elements
 // in the sub vector represent a move for white and a move for black

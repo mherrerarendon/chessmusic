@@ -15,10 +15,13 @@ pub async fn get_game(game_id: String) -> Result<String, Box<dyn Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use tokio::runtime::Runtime;
 
     #[test]
-    fn test_get_game() {
-        
-        assert_eq!(4, 4);
+    fn test_get_game() -> Result<(), Box<dyn Error>> {
+        Runtime::new()
+            .expect("Failed to create Tokio runtime")
+            .block_on(get_game(String::from("tzUJbFEX")))?;
+        Ok(())
     }
 }
