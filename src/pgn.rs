@@ -1,7 +1,5 @@
 use std::{error::Error};
 
-// get_moves returns a vector where each element is a vector of length 2. These elements
-// in the sub vector represent a move for white and a move for black
 fn parse_moves(game: &String) -> Result<Vec<(&str, &str)>, Box<dyn Error>> {
     let lines = game.lines();
 
