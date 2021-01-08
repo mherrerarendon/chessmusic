@@ -1,11 +1,11 @@
 use super::types::{Role, MoveType, Cell, role_char_to_role};
 
 pub struct Move {
-    role: Role,
+    pub role: Role,
     move_type: MoveType,
-    file_hint: String,
+    pub file_hint: char,
     check: bool,
-    cell: Cell,
+    pub cell: Cell,
     secondary_cell: Cell
 }
 
@@ -14,7 +14,7 @@ impl Move {
         Move {
             role: Role::Pawn,
             move_type: MoveType::Simple,
-            file_hint: String::from(""),
+            file_hint: ' ',
             check: false,
             cell: Cell::new(),
             secondary_cell: Cell::new()
@@ -56,7 +56,7 @@ impl Move {
     }
 
     // Assumed format of move_str "Nxd6" for Knight takes on d6
-    fn parse_single_move(move_str: &str) -> Move {
+    pub fn parse_single_move(move_str: &str) -> Move {
         if move_str.contains("O-O") {
             return Move::parse_castle_move(move_str);
         }
@@ -79,7 +79,7 @@ mod tests {
         let the_move = Move::parse_single_move("d4");
         assert_eq!(the_move.role, Role::Pawn);
         assert_eq!(the_move.move_type, MoveType::Simple);
-        assert_eq!(the_move.file_hint, "");
+        assert_eq!(the_move.file_hint, ' ');
         assert_eq!(the_move.check, false);
         assert_eq!(the_move.cell.file, 'd');
         assert_eq!(the_move.cell.row, 4);
@@ -90,7 +90,7 @@ mod tests {
         let the_move = Move::parse_single_move("d4+");
         assert_eq!(the_move.role, Role::Pawn);
         assert_eq!(the_move.move_type, MoveType::Simple);
-        assert_eq!(the_move.file_hint, "");
+        assert_eq!(the_move.file_hint, ' ');
         assert_eq!(the_move.check, true);
         assert_eq!(the_move.cell.file, 'd');
         assert_eq!(the_move.cell.row, 4);
@@ -101,7 +101,7 @@ mod tests {
         let the_move = Move::parse_single_move("Be4");
         assert_eq!(the_move.role, Role::Bishop);
         assert_eq!(the_move.move_type, MoveType::Simple);
-        assert_eq!(the_move.file_hint, "");
+        assert_eq!(the_move.file_hint, ' ');
         assert_eq!(the_move.check, false);
         assert_eq!(the_move.cell.file, 'e');
         assert_eq!(the_move.cell.row, 4);
@@ -112,7 +112,7 @@ mod tests {
         let the_move = Move::parse_single_move("Qxg6");
         assert_eq!(the_move.role, Role::Queen);
         assert_eq!(the_move.move_type, MoveType::Take);
-        assert_eq!(the_move.file_hint, "");
+        assert_eq!(the_move.file_hint, ' ');
         assert_eq!(the_move.check, false);
         assert_eq!(the_move.cell.file, 'g');
         assert_eq!(the_move.cell.row, 6);
@@ -123,7 +123,7 @@ mod tests {
         let the_move = Move::parse_single_move("O-O"); // These are capital "o"s
         assert_eq!(the_move.role, Role::King);
         assert_eq!(the_move.move_type, MoveType::CastleKing);
-        assert_eq!(the_move.file_hint, "");
+        assert_eq!(the_move.file_hint, ' ');
         assert_eq!(the_move.check, false);
     }
 
@@ -132,7 +132,7 @@ mod tests {
         let the_move = Move::parse_single_move("O-O-O"); // These are capital "o"s
         assert_eq!(the_move.role, Role::Queen);
         assert_eq!(the_move.move_type, MoveType::CastleQueen);
-        assert_eq!(the_move.file_hint, "");
+        assert_eq!(the_move.file_hint, ' ');
         assert_eq!(the_move.check, false);
     }
 
