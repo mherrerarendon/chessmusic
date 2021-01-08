@@ -24,15 +24,16 @@ pub enum MoveType {
     CastleQueen
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct Cell {
-    pub file: String,
+    pub file: char,
     pub row: u32
 }
 
 impl Cell {
     pub fn new() -> Cell {
         Cell {
-            file: String::from(""),
+            file: ' ',
             row: 0
         }
     }
