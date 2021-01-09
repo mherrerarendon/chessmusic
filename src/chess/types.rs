@@ -38,10 +38,10 @@ impl Cell {
         }
     }
 
-    pub fn new_with_values(file: &char, row: &u32) -> Cell {
+    pub fn new_with_values(file: char, row: u32) -> Cell {
         Cell {
-            file: *file,
-            row: *row
+            file: file,
+            row: row
         }
     }
 }
