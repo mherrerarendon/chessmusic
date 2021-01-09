@@ -1,16 +1,7 @@
 use std::collections::HashMap;
-use super::types::{Cell, Role};
+use super::types::{Cell, Role, MoveType};
 use super::chess_move::Move;
 
-// struct MovesByPiece {
-//     pieces: HashMap<uint32, Vec<String>>,
-// }
-
-// impl MovesByPiece {
-//     fn add_move(&self, the_move: &str) {
-//         self.pieces.insert(1, String::from(the_move));
-//     }
-// }
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 enum Piece {
     a2, b2, c2, d2, e2, f2, g2, h2, // white pawns
@@ -27,7 +18,13 @@ impl Game {
     fn new() -> Game {
         Game {
             moves_by_piece: [(Piece::a2, vec![Cell {file: 'a', row: 2}]),
-                             (Piece::b2, vec![Cell {file: 'b', row: 2}])]
+                             (Piece::b2, vec![Cell {file: 'b', row: 2}]),
+                             (Piece::c2, vec![Cell {file: 'c', row: 2}]),
+                             (Piece::d2, vec![Cell {file: 'd', row: 2}]),
+                             (Piece::e2, vec![Cell {file: 'e', row: 2}]),
+                             (Piece::f2, vec![Cell {file: 'f', row: 2}]),
+                             (Piece::g2, vec![Cell {file: 'g', row: 2}]),
+                             (Piece::h2, vec![Cell {file: 'h', row: 2}]),]
                 .iter().cloned().collect(),
         }
     }
@@ -67,7 +64,7 @@ impl Game {
         }
         else {
             for (piece, cell) in surviving_pieces_last_cell {
-                if self.is_valid_move_for_role(&role, &cell) {
+                if self.is_valid_move_for_role(&role, &cell, &the_move, &white) {
                     return piece;
                 }
             }
@@ -77,15 +74,50 @@ impl Game {
         return Piece::a2;
     }
 
-    fn is_valid_move_for_role(&self, role: &Role, curr_cell: &Cell) -> bool {
-        // TODO
-        true
+    fn get_valid_cells_for_move_and_role(&self, role: &Role, curr_cell: &Cell, the_move: &Move, white: &bool) -> Vec<Cell> {
+        let mut valid_cells: Vec<Cell> = Vec::new();
+        if *role == Role::Pawn {
+            if *white {
+                if curr_cell.row < 8 {
+                    if the_move.move_type == MoveType::Simple {
+                        valid_cells.push(Cell::new_with_values(&curr_cell.file, &(curr_cell.row + 1)))
+                    }
+                    else {
+                        // TODO:
+                    }
+                    
+                }
+            }
+        }
+        valid_cells
+    }
+
+    fn is_valid_move_for_role(&self, role: &Role, curr_cell: &Cell, the_move: &Move, white: &bool) -> bool {
+        let valid_cells = self.get_valid_cells_for_move_and_role(role, curr_cell, the_move, white);
+        for valid_cell in valid_cells.iter() {
+            if the_move.cell == *valid_cell {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     fn add_move(&mut self, white: &bool, the_move: &Move) {
         let piece = self.determine_piece_for_move(white, the_move);
         let mut moves = self.moves_by_piece.get_mut(&piece).unwrap(); //.push(the_move.cell);
         moves.push(the_move.cell);
+        if the_move.move_type == MoveType::CastleKing || the_move.move_type == MoveType::CastleQueen {
+            // TODO: handle castle move
+        }
+        else {
+            for (curr_piece, moves) in self.moves_by_piece.iter_mut() {
+                if *curr_piece != piece {
+                    let last_cell = moves.last().unwrap().clone();
+                    moves.push(last_cell);
+                }
+            }
+        }
     }
 }
 
@@ -106,8 +138,18 @@ mod tests {
         let mut game = Game::new();
         let the_move = Move::parse_single_move("a3");
         game.add_move(&true, &the_move);
-        let cell = game.get_position_for_move(&Piece::a2, 0);
+        let cell = game.get_position_for_move(&Piece::a2, 1);
         assert_eq!(cell.file, 'a');
+        assert_eq!(cell.row, 3);
+    }
+
+    #[test]
+    fn test_add_move_with_pawn_on_file_other_than_a() {
+        let mut game = Game::new();
+        let the_move = Move::parse_single_move("b3");
+        game.add_move(&true, &the_move);
+        let cell = game.get_position_for_move(&Piece::b2, 1);
+        assert_eq!(cell.file, 'b');
         assert_eq!(cell.row, 3);
     }
 }

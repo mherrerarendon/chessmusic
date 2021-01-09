@@ -2,7 +2,7 @@ use super::types::{Role, MoveType, Cell, role_char_to_role};
 
 pub struct Move {
     pub role: Role,
-    move_type: MoveType,
+    pub move_type: MoveType,
     pub file_hint: char,
     check: bool,
     pub cell: Cell,

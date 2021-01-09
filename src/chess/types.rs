@@ -24,7 +24,7 @@ pub enum MoveType {
     CastleQueen
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Cell {
     pub file: char,
     pub row: u32
@@ -35,6 +35,13 @@ impl Cell {
         Cell {
             file: ' ',
             row: 0
+        }
+    }
+
+    pub fn new_with_values(file: &char, row: &u32) -> Cell {
+        Cell {
+            file: *file,
+            row: *row
         }
     }
 }
