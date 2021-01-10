@@ -1,4 +1,5 @@
-use super::types::{Role, MoveType, Cell, role_char_to_role};
+use super::types::{Role, MoveType, role_char_to_role};
+use super::cell::Cell;
 
 pub struct Move {
     pub role: Role,
@@ -50,7 +51,7 @@ impl Move {
         the_move.role = caps.get(1).map_or(Role::Pawn, |m| role_char_to_role(m.as_str()));
         the_move.cell = Cell {
             file: caps.get(2).map_or(' ', |m| m.as_str().chars().next().unwrap()),
-            row: caps.get(3).map_or(0, |m| m.as_str().parse::<u32>().unwrap())
+            row: caps.get(3).map_or(0, |m| m.as_str().parse::<i32>().unwrap())
         };
         return the_move;
     }

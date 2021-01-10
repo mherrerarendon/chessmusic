@@ -21,25 +21,29 @@ impl Cell {
         }
     }
 
-    pub fn new_from_cell(cell: &Cell, file_offset: i32, row_offset: i32) -> Option<Cell> {
-        let new_row = cell.row + file_offset;
-        if new_row  < 1 || new_row > 8 {
-            return None;
-        }
-        let char_as_digit = match cell.file.to_digit(10) {
-            Some(char_as_digit) => char_as_digit,
-            None => return None
-        };
-        
-        let char_with_offset = (char_as_digit as i32 + file_offset) as u32;
-        let new_file = match char::from_digit(char_with_offset, 10) {
-            Some(new_char) => new_char,
-            None=> return None
-        };
+    fn file_with_offset(file: char, offset: i32) -> Option<char> {
+        let char_as_digit = file as i32;
+        let char_with_offset = char_as_digit + offset;
+        let new_file = if char_with_offset > 0 {char_with_offset as u8 as char} else {return None};
 
         if ! ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].contains(&new_file) {
             return None;
         }
+
+        Some(new_file)
+    }
+
+    pub fn new_from_cell(cell: &Cell, file_offset: i32, row_offset: i32) -> Option<Cell> {
+        let new_row = cell.row + row_offset;
+        if new_row  < 1 || new_row > 8 {
+            return None;
+        }
+       
+        let new_file_option = if file_offset == 0 {Some(cell.file)} else {Cell::file_with_offset(cell.file, file_offset)};
+        let new_file = match new_file_option {
+            Some(file) => file,
+            None => return None
+        };
 
         Some(Cell {file: new_file, row: new_row})
     }
@@ -50,14 +54,93 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_new_from_cell() {
+    fn test_cell_with_values() {
         let cell = Cell::new_with_values('a', 2);
         assert_eq!(cell.file, 'a');
         assert_eq!(cell.row, 2);
+    }
 
-        let new_cell = Cell::new_from_cell(&cell, 0, 1);
-        assert_ne!(new_cell.is_none());
-        assert_eq!(new_cell.file, 'a');
-        assert_eq!(new_cell.row, 3);
+    #[test]
+    fn test_new_from_cell_with_row_offset() {
+        let cell = Cell::new_with_values('a', 2);
+        match Cell::new_from_cell(&cell, 0, 1) {
+            Some(new_cell) => {
+                assert_eq!(new_cell.file, 'a');
+                assert_eq!(new_cell.row, 3);
+            },
+            None => assert!(false)
+        };
+    }
+
+    #[test]
+    fn test_new_from_cell_with_file_offset() {
+        let cell = Cell::new_with_values('a', 2);
+        match Cell::new_from_cell(&cell, 1, 0) {
+            Some(new_cell) => {
+                assert_eq!(new_cell.file, 'b');
+                assert_eq!(new_cell.row, 2);
+            },
+            None => assert!(false)
+        };
+    }
+
+    #[test]
+    fn test_new_from_cell_with_file_and_row_offsets() {
+        let cell = Cell::new_with_values('a', 2);
+        match Cell::new_from_cell(&cell, 1, 1) {
+            Some(new_cell) => {
+                assert_eq!(new_cell.file, 'b');
+                assert_eq!(new_cell.row, 3);
+            },
+            None => assert!(false)
+        };
+    }
+
+    #[test]
+    fn test_new_from_cell_with_negative_offsets() {
+        let cell = Cell::new_with_values('b', 2);
+        match Cell::new_from_cell(&cell, -1, -1) {
+            Some(new_cell) => {
+                assert_eq!(new_cell.file, 'a');
+                assert_eq!(new_cell.row, 1);
+            },
+            None => assert!(false)
+        };
+    }
+
+    #[test]
+    fn test_new_from_cell_to_invalid_row() {
+        let cell = Cell::new_with_values('a', 1);
+        match Cell::new_from_cell(&cell, 0, -1) {
+            Some(_new_cell) => {
+                assert!(false)
+            },
+            None => assert!(true)
+        };
+
+        match Cell::new_from_cell(&cell, 0, 8) {
+            Some(_new_cell) => {
+                assert!(false)
+            },
+            None => assert!(true)
+        };
+    }
+
+    #[test]
+    fn test_new_from_cell_to_invalid_file() {
+        let cell = Cell::new_with_values('a', 1);
+        match Cell::new_from_cell(&cell, -1, 0) {
+            Some(_new_cell) => {
+                assert!(false)
+            },
+            None => assert!(true)
+        };
+
+        match Cell::new_from_cell(&cell, 8, 0) {
+            Some(_new_cell) => {
+                assert!(false)
+            },
+            None => assert!(true)
+        };
     }
 }

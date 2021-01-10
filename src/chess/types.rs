@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-
+use super::cell::Cell;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum Role {
@@ -25,14 +25,8 @@ pub enum MoveType {
     CastleQueen
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum PieceName {
     Apawn, Bpawn, Cpawn, Dpawn, Epawn, Fpawn, Gpawn, Hpawn,
     Qrook, Qknight, Qbishop, Queen, King, Kbishop, Kknight, Krook
-}
-pub struct Piece {
-    name: PieceName,
-    pub white: bool, 
-    role: Role,
-    pub cell: Cell
 }
