@@ -5,10 +5,6 @@ use super::cell::Cell;
 use super::piece::{NotPawn, Pawn, Piece};
 
 
-// pub struct Board {
-//     pieces: Vec<Piece>,
-// }
-
 pub struct Board {
     pub pieces: Vec<Box<dyn Piece>>,
 }
@@ -63,19 +59,39 @@ impl Board {
         return None;
     }
 
-    // fn get_valid_cells_for_pawn(&self, piece: Piece) -> Vec<Cell> {
-    //     let mut valid_cells: Vec<Cell> = Vec::new();
-    //     let direction = if piece.white { 1 } else { -1 };
-    //     valid_cells
-    // }
+    pub fn get_piece_with_name(&self, name: PieceName, white: bool) -> Option<&Box<dyn Piece>> {
+        for piece in self.pieces.iter() {
+            if piece.get_name() == name && piece.is_white() == white {
+                return Some(piece);
+            }
+        }
 
-    // fn get_valid_cells(piece: &Piece) -> Vec<Cell> {
-    //     match piece {
-    //         Piece::a1(cell) => vec![Cell {file: 'a', row: 1}],
-    //         _ => vec![Cell {file: 'a', row: 1}]
-    //     }
+        return None;
+    }
 
-    // }
+    fn get_mut_piece_with_name(&mut self, name: PieceName, white: bool) -> Option<&mut Box<dyn Piece>> {
+        for piece in self.pieces.iter_mut() {
+            if piece.get_name() == name && piece.is_white() == white {
+                return Some(piece);
+            }
+        }
+
+        return None;
+    }
+
+    pub fn get_pieces_with_role(&self, role: Role, white: bool) -> Vec<&Box<dyn Piece>> {
+        return self.pieces.iter().filter(|piece| piece.get_role() == role && piece.is_white() == white).collect();
+    }
+
+    pub fn move_piece(&mut self, name: PieceName, white: bool, cell: &Cell) {
+        match self.get_mut_piece_with_name(name, white) {
+            Some(piece) => {
+                piece.set_new_cell(&cell);
+                piece.set_has_moved();
+            },
+            None => println!("unable to move piece")
+        }
+    }
 }
 
 #[cfg(test)]
@@ -90,6 +106,39 @@ mod tests {
                 assert_eq!(piece.get_name(), PieceName::Apawn);
                 assert!(piece.is_white());
                 assert!(!piece.has_moved());
+            },
+            None => assert!(false)
+        }
+    }
+
+    #[test]
+    fn test_get_white_pawns() {
+        let board = Board::new();
+        let white_pawns = board.get_pieces_with_role(Role::Pawn, true);
+        assert_eq!(white_pawns.len(), 8);
+        assert_eq!(white_pawns[0].get_role(), Role::Pawn);
+        assert!(white_pawns[0].is_white());
+    }
+
+    #[test]
+    fn test_get_black_pawns() {
+        let board = Board::new();
+        let white_pawns = board.get_pieces_with_role(Role::Pawn, false);
+        assert_eq!(white_pawns.len(), 8);
+        assert_eq!(white_pawns[0].get_role(), Role::Pawn);
+        assert!(!white_pawns[0].is_white());
+    }
+
+    #[test]
+    fn test_move_piece() {
+        let mut board = Board::new();
+        let new_cell = Cell::new_with_values('b', 3);
+        board.move_piece(PieceName::Bpawn, true, &new_cell);
+        match board.get_piece_at_cell(&new_cell) {
+            Some(piece) => {
+                assert_eq!(piece.get_name(), PieceName::Bpawn);
+                assert!(piece.is_white());
+                assert!(piece.has_moved());
             },
             None => assert!(false)
         }

@@ -57,7 +57,7 @@ impl Move {
     }
 
     // Assumed format of move_str "Nxd6" for Knight takes on d6
-    pub fn parse_single_move(move_str: &str) -> Move {
+    pub fn parse(move_str: &str) -> Move {
         if move_str.contains("O-O") {
             return Move::parse_castle_move(move_str);
         }
@@ -77,7 +77,7 @@ mod tests {
 
     #[test]
     fn test_parse_simple_move() {
-        let the_move = Move::parse_single_move("d4");
+        let the_move = Move::parse("d4");
         assert_eq!(the_move.role, Role::Pawn);
         assert_eq!(the_move.move_type, MoveType::Simple);
         assert_eq!(the_move.file_hint, ' ');
@@ -88,7 +88,7 @@ mod tests {
 
     #[test]
     fn test_parse_move_with_check() {
-        let the_move = Move::parse_single_move("d4+");
+        let the_move = Move::parse("d4+");
         assert_eq!(the_move.role, Role::Pawn);
         assert_eq!(the_move.move_type, MoveType::Simple);
         assert_eq!(the_move.file_hint, ' ');
@@ -99,7 +99,7 @@ mod tests {
 
     #[test]
     fn test_parse_non_pawn_move() {
-        let the_move = Move::parse_single_move("Be4");
+        let the_move = Move::parse("Be4");
         assert_eq!(the_move.role, Role::Bishop);
         assert_eq!(the_move.move_type, MoveType::Simple);
         assert_eq!(the_move.file_hint, ' ');
@@ -110,7 +110,7 @@ mod tests {
 
     #[test]
     fn test_parse_non_pawn_move_with_take() {
-        let the_move = Move::parse_single_move("Qxg6");
+        let the_move = Move::parse("Qxg6");
         assert_eq!(the_move.role, Role::Queen);
         assert_eq!(the_move.move_type, MoveType::Take);
         assert_eq!(the_move.file_hint, ' ');
@@ -121,7 +121,7 @@ mod tests {
 
     #[test]
     fn test_parse_king_side_castle() {
-        let the_move = Move::parse_single_move("O-O"); // These are capital "o"s
+        let the_move = Move::parse("O-O"); // These are capital "o"s
         assert_eq!(the_move.role, Role::King);
         assert_eq!(the_move.move_type, MoveType::CastleKing);
         assert_eq!(the_move.file_hint, ' ');
@@ -130,7 +130,7 @@ mod tests {
 
     #[test]
     fn test_parse_queen_side_castle() {
-        let the_move = Move::parse_single_move("O-O-O"); // These are capital "o"s
+        let the_move = Move::parse("O-O-O"); // These are capital "o"s
         assert_eq!(the_move.role, Role::Queen);
         assert_eq!(the_move.move_type, MoveType::CastleQueen);
         assert_eq!(the_move.file_hint, ' ');
