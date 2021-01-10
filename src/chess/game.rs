@@ -34,6 +34,9 @@ impl Game {
     }
 
     fn get_pieces_with_role(white: bool, role: Role) -> Vec<Piece> {
+        match role {
+            Role::Pawn => vec![Piece::a2, Piece::b2, Piece::c2, Piece::d2, Piece::e2, Piece::f2, Piece::g2, Piece::h2]
+        }
         if role == Role::Pawn {
             return vec![Piece::a2, Piece::b2, Piece::c2, Piece::d2, Piece::e2, Piece::f2, Piece::g2, Piece::h2];
         }
@@ -105,7 +108,7 @@ impl Game {
 
     fn add_move(&mut self, white: bool, the_move: &Move) {
         let piece = self.determine_piece_for_move(white, the_move);
-        let mut moves = self.moves_by_piece.get_mut(&piece).unwrap(); //.push(the_move.cell);
+        let mut moves = self.moves_by_piece.get_mut(&piece).unwrap(); 
         moves.push(the_move.cell);
         if the_move.move_type == MoveType::CastleKing || the_move.move_type == MoveType::CastleQueen {
             // TODO: handle castle move

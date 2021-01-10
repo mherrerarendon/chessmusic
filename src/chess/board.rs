@@ -1,36 +1,73 @@
 use std::collections::HashMap;
 use std::{error::Error};
+use super::types::{Cell, Piece, Role, PieceName};
 
 
 struct Board {
-    board: Vec<Vec<String>>,
+    pieces: Vec<Piece>,
 }
-
 
 impl Board {
     fn new() -> Board {
-        let files = vec!["a", "b", "c", "d", "e", "f", "g", "h"];
-        let mut rows = Vec::new();
-        for n in 1..=8 {
-            let mut row = Vec::new();
-            let row_str = n.to_string();
-            for file in files.iter() {
-                let cell_name = format!("{}{}", file, row_str);
-                row.push(cell_name);
-            }
-
-            rows.push(row);
+        Board {
+            pieces: vec![
+                Piece {name: PieceName::Apawn, white: true, role: Role::Pawn, cell: Cell {file: 'a', row: 2}},
+                Piece {name: PieceName::Bpawn, white: true, role: Role::Pawn, cell: Cell {file: 'b', row: 2}},
+                Piece {name: PieceName::Cpawn, white: true, role: Role::Pawn, cell: Cell {file: 'c', row: 2}},
+                Piece {name: PieceName::Dpawn, white: true, role: Role::Pawn, cell: Cell {file: 'd', row: 2}},
+                Piece {name: PieceName::Epawn, white: true, role: Role::Pawn, cell: Cell {file: 'e', row: 2}},
+                Piece {name: PieceName::Fpawn, white: true, role: Role::Pawn, cell: Cell {file: 'f', row: 2}},
+                Piece {name: PieceName::Gpawn, white: true, role: Role::Pawn, cell: Cell {file: 'g', row: 2}},
+                Piece {name: PieceName::Hpawn, white: true, role: Role::Pawn, cell: Cell {file: 'h', row: 2}},
+                Piece {name: PieceName::Qrook, white: true, role: Role::Rook, cell: Cell {file: 'a', row: 1}},
+                Piece {name: PieceName::Qknight, white: true, role: Role::Knight, cell: Cell {file: 'b', row: 1}},
+                Piece {name: PieceName::Qbishop, white: true, role: Role::Bishop, cell: Cell {file: 'c', row: 1}},
+                Piece {name: PieceName::Queen, white: true, role: Role::Queen, cell: Cell {file: 'd', row: 1}},
+                Piece {name: PieceName::King, white: true, role: Role::King, cell: Cell {file: 'e', row: 1}},
+                Piece {name: PieceName::Kbishop, white: true, role: Role::Bishop, cell: Cell {file: 'f', row: 1}},
+                Piece {name: PieceName::Kknight, white: true, role: Role::Knight, cell: Cell {file: 'g', row: 1}},
+                Piece {name: PieceName::Krook, white: true, role: Role::Rook, cell: Cell {file: 'h', row: 1}},
+                Piece {name: PieceName::Apawn, white: false, role: Role::Pawn, cell: Cell {file: 'a', row: 7}},
+                Piece {name: PieceName::Bpawn, white: false, role: Role::Pawn, cell: Cell {file: 'b', row: 7}},
+                Piece {name: PieceName::Cpawn, white: false, role: Role::Pawn, cell: Cell {file: 'c', row: 7}},
+                Piece {name: PieceName::Dpawn, white: false, role: Role::Pawn, cell: Cell {file: 'd', row: 7}},
+                Piece {name: PieceName::Epawn, white: false, role: Role::Pawn, cell: Cell {file: 'e', row: 7}},
+                Piece {name: PieceName::Fpawn, white: false, role: Role::Pawn, cell: Cell {file: 'f', row: 7}},
+                Piece {name: PieceName::Gpawn, white: false, role: Role::Pawn, cell: Cell {file: 'g', row: 7}},
+                Piece {name: PieceName::Hpawn, white: false, role: Role::Pawn, cell: Cell {file: 'h', row: 7}},
+                Piece {name: PieceName::Qrook, white: false, role: Role::Rook, cell: Cell {file: 'a', row: 8}},
+                Piece {name: PieceName::Qknight, white: false, role: Role::Knight, cell: Cell {file: 'b', row: 8}},
+                Piece {name: PieceName::Qbishop, white: false, role: Role::Bishop, cell: Cell {file: 'c', row: 8}},
+                Piece {name: PieceName::Queen, white: false, role: Role::Queen, cell: Cell {file: 'd', row: 8}},
+                Piece {name: PieceName::King, white: false, role: Role::King, cell: Cell {file: 'e', row: 8}},
+                Piece {name: PieceName::Kbishop, white: false, role: Role::Bishop, cell: Cell {file: 'f', row: 8}},
+                Piece {name: PieceName::Kknight, white: false, role: Role::Knight, cell: Cell {file: 'g', row: 8}},
+                Piece {name: PieceName::Krook, white: false, role: Role::Rook, cell: Cell {file: 'h', row: 8}}
+            ]
         }
-
-        Board {board: rows}
     }
 
-    // fn file_to_index(the_file: &str) -> u32 {
-    //     let files = vec!["a", "b", "c", "d", "e", "f", "g", "h"];
-    //     files.iter().position(|&r| r == the_file).unwrap()
-    // }
+    fn get_piece_at_cell(&self, cell: &Cell) -> Option<&Piece> {
+        for piece in self.pieces.iter() {
+            if piece.cell == *cell {
+                return Some(piece);
+            }
+        }
 
-    // fn get_possible_moves(piece: &str, curr_cell: &str) -> Vec<String> {
+        return None;
+    }
 
-    // }
+    fn get_valid_cells_for_pawn(&self, piece: Piece) -> Vec<Cell> {
+        let mut valid_cells: Vec<Cell> = Vec::new();
+        let direction = if piece.white { 1 } else { -1 };
+        valid_cells
+    }
+
+    fn get_valid_cells(piece: &Piece) -> Vec<Cell> {
+        match piece {
+            Piece::a1(cell) => vec![Cell {file: 'a', row: 1}],
+            _ => vec![Cell {file: 'a', row: 1}]
+        }
+
+    }
 }

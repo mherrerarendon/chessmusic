@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum Role {
     Pawn,
@@ -24,29 +25,14 @@ pub enum MoveType {
     CastleQueen
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Cell {
-    pub file: char,
-    pub row: u32
+#[derive(Debug)]
+pub enum PieceName {
+    Apawn, Bpawn, Cpawn, Dpawn, Epawn, Fpawn, Gpawn, Hpawn,
+    Qrook, Qknight, Qbishop, Queen, King, Kbishop, Kknight, Krook
 }
-
-impl Cell {
-    pub fn new() -> Cell {
-        Cell {
-            file: ' ',
-            row: 0
-        }
-    }
-
-    pub fn new_with_values(file: char, row: u32) -> Cell {
-        Cell {
-            file: file,
-            row: row
-        }
-    }
-}
-
-struct Piece {
-    white: bool, 
-    role: Role
+pub struct Piece {
+    name: PieceName,
+    pub white: bool, 
+    role: Role,
+    pub cell: Cell
 }
