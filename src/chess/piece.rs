@@ -2,10 +2,6 @@ use super::cell::Cell;
 use super::types::{Role, PieceName};
 use super::board::Board;
 
-// pub trait ValidCells {
-//     fn get_valid_cells(&self, board: &Board) -> Vec<Cell>;
-// }
-
 pub trait Piece {
     // common data
     fn get_name(&self) -> PieceName;
@@ -47,15 +43,24 @@ pub struct Pawn {
 }
 
 impl Pawn {
-    fn add_cell_if_valid_and_empty(&self, board: &Board, cell: Option<Cell>, mut valid_cells: Vec<Cell>) -> Vec<Cell> {
+    fn add_cell_if_valid(&self, board: &Board, cell: Option<Cell>, needs_empty: bool, mut valid_cells: Vec<Cell>) -> Vec<Cell> {
         match cell {
             Some(cell) => {
                 match board.get_piece_at_cell(&cell) {
-                    Some(_piece) => (),
-                    None => valid_cells.push(cell)
+                    Some(_piece) => {
+                        if !needs_empty {
+                            valid_cells.push(cell)
+                        }
+                    },
+                    None => {
+                        if needs_empty {
+                            valid_cells.push(cell)
+                        }
+                    }
                 }
             },
             None => ()
+
         }
 
         valid_cells
@@ -74,50 +79,19 @@ impl Piece for Pawn {
         let mut valid_cells: Vec<Cell> = Vec::new();
         let direction = if self.white {1} else {-1};
         if self.first_move {
-            match Cell::new_from_cell(&self.cell, 0, 2 * direction) {
-                Some(cell) => {
-                    match board.get_piece_at_cell(&cell) {
-                        Some(_piece) => (),
-                        None => valid_cells.push(cell)
-                    }
-                },
-                None => ()
-            }
+            let double_forward_cell_option = Cell::new_from_cell(&self.cell, 0, 2 * direction);
+            valid_cells = self.add_cell_if_valid(board, double_forward_cell_option, true, valid_cells);
         }
         else {
-            // Take left
-            match Cell::new_from_cell(&self.cell, -1, 1 * direction) {
-                Some(cell) => {
-                    match board.get_piece_at_cell(&cell) {
-                        Some(_piece) => valid_cells.push(cell),
-                        None => ()
-                    }
-                },
-                None => ()
-            }
+            let take_left_cell_option = Cell::new_from_cell(&self.cell, -1, 1 * direction);
+            valid_cells = self.add_cell_if_valid(board, take_left_cell_option, false, valid_cells);
 
-            // Take right
-            match Cell::new_from_cell(&self.cell, -1, 1 * direction) {
-                Some(cell) => {
-                    match board.get_piece_at_cell(&cell) {
-                        Some(_piece) => valid_cells.push(cell),
-                        None => ()
-                    }
-                },
-                None => ()
-            }
+            let take_right_cell_option = Cell::new_from_cell(&self.cell, -1, 1 * direction);
+            valid_cells = self.add_cell_if_valid(board, take_right_cell_option, false, valid_cells);
         }
 
-        // Simple forward
-        match Cell::new_from_cell(&self.cell, 0, 1 * direction) {
-            Some(cell) => {
-                match board.get_piece_at_cell(&cell) {
-                    Some(_piece) => (),
-                    None => valid_cells.push(cell)
-                }
-            },
-            None => ()
-        }
+        let double_forward_cell_option = Cell::new_from_cell(&self.cell, 0, 1 * direction);
+        valid_cells = self.add_cell_if_valid(board, double_forward_cell_option, true, valid_cells);
 
         valid_cells
     }
@@ -128,7 +102,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_get_valid_cells() {
+    fn test_get_pawn_valid_cells_white() {
         let board = Board::new();
         match board.get_piece_at_cell(&Cell {file: 'a', row: 2}) {
             Some(piece) => {
@@ -136,6 +110,20 @@ mod tests {
                 assert_eq!(valid_cells.len(), 2);
                 assert!(valid_cells.contains(&Cell {file: 'a', row: 3}));
                 assert!(valid_cells.contains(&Cell {file: 'a', row: 4}));
+            },
+            None => ()
+        }
+    }
+
+    #[test]
+    fn test_get_pawn_valid_cells_black() {
+        let board = Board::new();
+        match board.get_piece_at_cell(&Cell {file: 'a', row: 7}) {
+            Some(piece) => {
+                let valid_cells = piece.get_valid_cells(&board);
+                assert_eq!(valid_cells.len(), 2);
+                assert!(valid_cells.contains(&Cell {file: 'a', row: 6}));
+                assert!(valid_cells.contains(&Cell {file: 'a', row: 5}));
             },
             None => ()
         }
