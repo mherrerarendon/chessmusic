@@ -14,7 +14,12 @@ pub enum Role {
 pub fn role_char_to_role(role_char: &str) -> Role {
     let char_to_role: HashMap<&str, Role> = [("", Role::Pawn), ("B", Role::Bishop), ("N", Role::Knight), ("R", Role::Rook), ("Q", Role::Queen), ("K", Role::King)]
         .iter().cloned().collect();
-    char_to_role[role_char]
+    if char_to_role.contains_key(role_char) {
+        return char_to_role[role_char];
+    }
+    else {
+        return Role::Pawn;
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
