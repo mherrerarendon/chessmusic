@@ -7,12 +7,12 @@ use super::piece::Piece;
 
 use std::error::Error;
 
-struct Game {
-    board: Board
+pub struct Game {
+    pub board: Board
 }
 
 impl Game {
-    fn new() -> Game {
+    pub fn new() -> Game {
         Game {
             board: Board::new()
         }
@@ -78,26 +78,38 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_get_piece_for_move() {
+    fn test_get_piece_for_white_pawn_simple_move() {
         let game = Game::new();
         let name = game.get_piece_for_move(true, &Move::parse("a3")).unwrap();
         assert_eq!(name, PieceName::Apawn);
     }
 
     #[test]
-    fn test_get_piece_for_move_with_take() {
+    fn test_get_piece_for_black_pawn_simple_move() {
+        let game = Game::new();
+        let name = game.get_piece_for_move(false, &Move::parse("a6")).unwrap();
+        assert_eq!(name, PieceName::Apawn);
+    }
+
+    #[test]
+    fn test_get_piece_for_pawn_take() {
         let mut game = Game::new();
         game.add_move(&Move::parse("d4"), &Move::parse("e5"));
         let name = game.get_piece_for_move(true, &Move::parse("dxe5")).unwrap();
         assert_eq!(name, PieceName::Dpawn);
-        // game.add_move(&Move::parse("dxe5"), &Move::parse("a6"));
     }
 
     #[test]
     fn test_pawn_history() {
         let game_moves = vec![(Move::parse("a3"), Move::parse("a6"))];
-        let pawn_history = Game::get_piece_history(PieceName::Apawn, true, &game_moves);
-        
-        assert_eq!(pawn_history.len(), 2);
+        let white_pawn_history = Game::get_piece_history(PieceName::Apawn, true, &game_moves);
+        assert_eq!(white_pawn_history.len(), 2);
+        assert_eq!(white_pawn_history[0], Cell {file: 'a', row: 2});
+        assert_eq!(white_pawn_history[1], Cell {file: 'a', row: 3});
+
+        let black_pawn_history = Game::get_piece_history(PieceName::Apawn, false, &game_moves);
+        assert_eq!(black_pawn_history.len(), 2);
+        assert_eq!(black_pawn_history[0], Cell {file: 'a', row: 7});
+        assert_eq!(black_pawn_history[1], Cell {file: 'a', row: 6});
     }
 }

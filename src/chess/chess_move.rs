@@ -6,8 +6,7 @@ pub struct Move {
     pub move_type: MoveType,
     pub file_hint: char,
     check: bool,
-    pub cell: Cell,
-    secondary_cell: Cell
+    pub cell: Cell
 }
 
 impl Move {
@@ -17,8 +16,7 @@ impl Move {
             move_type: MoveType::Simple,
             file_hint: ' ',
             check: false,
-            cell: Cell::new(),
-            secondary_cell: Cell::new()
+            cell: Cell {file: ' ', row: 0}
         }
     }
 
@@ -82,7 +80,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_parse_simple_move() {
+    fn test_parse_simple_pawn_move() {
         let the_move = Move::parse("d4");
         assert_eq!(the_move.role, Role::Pawn);
         assert_eq!(the_move.move_type, MoveType::Simple);
@@ -92,23 +90,23 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_move_with_check() {
-        let the_move = Move::parse("d4+");
-        assert_eq!(the_move.role, Role::Pawn);
-        assert_eq!(the_move.move_type, MoveType::Simple);
-        assert_eq!(the_move.file_hint, ' ');
-        assert_eq!(the_move.check, true);
-        assert_eq!(the_move.cell, Cell {file: 'd', row: 4});
-    }
-
-    #[test]
-    fn test_parse_move_with_take() {
+    fn test_parse_pawn_move_with_take() {
         let the_move = Move::parse("dxe5");
         assert_eq!(the_move.role, Role::Pawn);
         assert_eq!(the_move.move_type, MoveType::Take);
         assert_eq!(the_move.file_hint, 'd');
         assert_eq!(the_move.check, false);
         assert_eq!(the_move.cell, Cell {file: 'e', row: 5});
+    }
+
+    #[test]
+    fn test_parse_pawn_move_with_check() {
+        let the_move = Move::parse("d4+");
+        assert_eq!(the_move.role, Role::Pawn);
+        assert_eq!(the_move.move_type, MoveType::Simple);
+        assert_eq!(the_move.file_hint, ' ');
+        assert_eq!(the_move.check, true);
+        assert_eq!(the_move.cell, Cell {file: 'd', row: 4});
     }
 
     #[test]

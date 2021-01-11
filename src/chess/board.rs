@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use std::{error::Error};
 use super::types::{Role, PieceName};
 use super::cell::Cell;
-use super::piece::{NotPawn, Pawn, Piece};
+use super::piece::{Piece};
+use super::pawn::Pawn;
 
 
 pub struct Board {
@@ -132,7 +133,7 @@ mod tests {
     #[test]
     fn test_move_piece() {
         let mut board = Board::new();
-        let new_cell = Cell::new_with_values('b', 3);
+        let new_cell = Cell::new("b3");
         board.move_piece(PieceName::Bpawn, true, &new_cell);
         match board.get_piece_at_cell(&new_cell) {
             Some(piece) => {

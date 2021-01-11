@@ -7,17 +7,17 @@ pub struct Cell {
 }
 
 impl Cell {
-    pub fn new() -> Cell {
+    pub fn new(cell_name: &str) -> Cell {
         Cell {
-            file: ' ',
-            row: 0
+            file: cell_name.chars().nth(0).unwrap(),
+            row: cell_name.chars().nth(1).unwrap().to_digit(10).unwrap() as i32
         }
     }
 
-    pub fn new_with_values(file: char, row: i32) -> Cell {
+    pub fn new_with_name(cell_name: &str) -> Cell {
         Cell {
-            file: file,
-            row: row
+            file: cell_name.chars().nth(0).unwrap(),
+            row: cell_name.chars().nth(0).unwrap().to_digit(10).unwrap() as i32
         }
     }
 
@@ -55,14 +55,14 @@ mod tests {
 
     #[test]
     fn test_cell_with_values() {
-        let cell = Cell::new_with_values('a', 2);
+        let cell = Cell::new("a2");
         assert_eq!(cell.file, 'a');
         assert_eq!(cell.row, 2);
     }
 
     #[test]
     fn test_new_from_cell_with_row_offset() {
-        let cell = Cell::new_with_values('a', 2);
+        let cell = Cell::new("a2");
         match Cell::new_from_cell(&cell, 0, 1) {
             Some(new_cell) => {
                 assert_eq!(new_cell.file, 'a');
@@ -74,7 +74,7 @@ mod tests {
 
     #[test]
     fn test_new_from_cell_with_file_offset() {
-        let cell = Cell::new_with_values('a', 2);
+        let cell = Cell::new("a2");
         match Cell::new_from_cell(&cell, 1, 0) {
             Some(new_cell) => {
                 assert_eq!(new_cell.file, 'b');
@@ -86,7 +86,7 @@ mod tests {
 
     #[test]
     fn test_new_from_cell_with_file_and_row_offsets() {
-        let cell = Cell::new_with_values('a', 2);
+        let cell = Cell::new("a2");
         match Cell::new_from_cell(&cell, 1, 1) {
             Some(new_cell) => {
                 assert_eq!(new_cell.file, 'b');
@@ -98,7 +98,7 @@ mod tests {
 
     #[test]
     fn test_new_from_cell_with_negative_offsets() {
-        let cell = Cell::new_with_values('b', 2);
+        let cell = Cell::new("b2");
         match Cell::new_from_cell(&cell, -1, -1) {
             Some(new_cell) => {
                 assert_eq!(new_cell.file, 'a');
@@ -110,7 +110,7 @@ mod tests {
 
     #[test]
     fn test_new_from_cell_to_invalid_row() {
-        let cell = Cell::new_with_values('a', 1);
+        let cell = Cell::new("a1");
         match Cell::new_from_cell(&cell, 0, -1) {
             Some(_new_cell) => {
                 assert!(false)
@@ -128,7 +128,7 @@ mod tests {
 
     #[test]
     fn test_new_from_cell_to_invalid_file() {
-        let cell = Cell::new_with_values('a', 1);
+        let cell = Cell::new("a1");
         match Cell::new_from_cell(&cell, -1, 0) {
             Some(_new_cell) => {
                 assert!(false)
@@ -142,5 +142,11 @@ mod tests {
             },
             None => assert!(true)
         };
+    }
+
+    #[test]
+    fn test_new_cell() {
+        let cell = Cell::new("a1");
+        assert_eq!(cell, Cell {file: 'a', row: 1});
     }
 }
