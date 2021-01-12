@@ -18,7 +18,7 @@ impl Board {
                 Box::new(Rook::new(true, PieceName::Qrook)),
                 Box::new(Rook::new(true, PieceName::Krook)),
                 Box::new(Rook::new(false, PieceName::Qrook)),
-                Box::new(Rook::new(false, PieceName::Qrook)),
+                Box::new(Rook::new(false, PieceName::Krook)),
             ]
         }
     }

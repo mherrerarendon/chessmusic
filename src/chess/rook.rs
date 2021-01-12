@@ -135,6 +135,15 @@ mod tests {
 
                 // Other rook is at h1, so this should be an invalid move
                 assert!(!rook.is_valid_move(&board, &Move::parse("h1")));
+
+                assert!(rook.is_valid_move(&board, &Move::parse("a2")));
+                assert!(rook.is_valid_move(&board, &Move::parse("a3")));
+                assert!(rook.is_valid_move(&board, &Move::parse("a4")));
+                assert!(rook.is_valid_move(&board, &Move::parse("a5")));
+                assert!(rook.is_valid_move(&board, &Move::parse("a6")));
+                assert!(rook.is_valid_move(&board, &Move::parse("a7")));
+                assert!(rook.is_valid_move(&board, &Move::parse("a8")));
+
             },
             None => panic!("expected to find piece")
         }
@@ -158,6 +167,38 @@ mod tests {
 
                 // self rook is at h1, so this should be an invalid move
                 assert!(!rook.is_valid_move(&board, &Move::parse("h1")));
+            },
+            None => panic!("expected to find piece")
+        }
+    }
+
+    #[test]
+    fn test_black_q_rook_moves() {
+        let board = Board::new_rook_test();
+        match board.get_piece_at_cell(&Cell {file: 'a', row: 8}) {
+            Some(rook) => {
+                // self rook is at a1, so should be invalid
+                assert!(!rook.is_valid_move(&board, &Move::parse("a8")));
+
+                // valid
+                assert!(rook.is_valid_move(&board, &Move::parse("b8")));
+                assert!(rook.is_valid_move(&board, &Move::parse("c8")));
+                assert!(rook.is_valid_move(&board, &Move::parse("d8")));
+                assert!(rook.is_valid_move(&board, &Move::parse("e8")));
+                assert!(rook.is_valid_move(&board, &Move::parse("f8")));
+                assert!(rook.is_valid_move(&board, &Move::parse("g8")));
+
+                // Other rook is at h1, so this should be an invalid move
+                assert!(!rook.is_valid_move(&board, &Move::parse("h8")));
+
+                assert!(rook.is_valid_move(&board, &Move::parse("a1")));
+                assert!(rook.is_valid_move(&board, &Move::parse("a2")));
+                assert!(rook.is_valid_move(&board, &Move::parse("a3")));
+                assert!(rook.is_valid_move(&board, &Move::parse("a4")));
+                assert!(rook.is_valid_move(&board, &Move::parse("a5")));
+                assert!(rook.is_valid_move(&board, &Move::parse("a6")));
+                assert!(rook.is_valid_move(&board, &Move::parse("a7")));
+
             },
             None => panic!("expected to find piece")
         }
