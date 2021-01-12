@@ -5,6 +5,7 @@ use super::cell::Cell;
 use super::piece::{Piece};
 use super::pawn::Pawn;
 use super::rook::Rook;
+use super::knight::Knight;
 
 
 pub struct Board {
@@ -23,9 +24,24 @@ impl Board {
         }
     }
 
+    fn dump(&self) {
+        for row in 1..=8 {
+            let mut the_line = String::new();
+            for file in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].iter() {
+                let cell = Cell {file: *file, row: row};
+                match self.get_piece_at_cell(&cell) {
+                    Some(_piece) => the_line.push('.'),
+                    None => the_line.push(' ')
+                }
+            }
+            println!("{:?}{:?}", the_line, row);
+        }
+    }
+
     pub fn new() -> Board {
         Board {
             pieces: vec![
+                // White pieces
                 Box::new(Pawn::new(true, PieceName::Apawn)),
                 Box::new(Pawn::new(true, PieceName::Bpawn)),
                 Box::new(Pawn::new(true, PieceName::Cpawn)),
@@ -35,13 +51,15 @@ impl Board {
                 Box::new(Pawn::new(true, PieceName::Gpawn)),
                 Box::new(Pawn::new(true, PieceName::Hpawn)),
                 Box::new(Rook::new(true, PieceName::Qrook)),
-                // Box::new(Piece {name: PieceName::Qknight, white: true, role: Role::Knight, cell: Cell {file: 'b', row: 1}},
-                // Box::new(Piece {name: PieceName::Qbishop, white: true, role: Role::Bishop, cell: Cell {file: 'c', row: 1}},
-                // Box::new(Piece {name: PieceName::Queen, white: true, role: Role::Queen, cell: Cell {file: 'd', row: 1}},
-                // Box::new(Piece {name: PieceName::King, white: true, role: Role::King, cell: Cell {file: 'e', row: 1}},
-                // Box::new(Piece {name: PieceName::Kbishop, white: true, role: Role::Bishop, cell: Cell {file: 'f', row: 1}},
-                // Box::new(Piece {name: PieceName::Kknight, white: true, role: Role::Knight, cell: Cell {file: 'g', row: 1}},
+                Box::new(Knight::new(true, PieceName::Qknight)),
+                // Box::new(Bishop::new(true, PieceName::Qbishop)),
+                // Box::new(Queen::new(true, PieceName::Queen)),
+                // Box::new(King::new(true, PieceName::King)),
+                // Box::new(Bishop::new(true, PieceName::Kbishop)),
+                Box::new(Knight::new(true, PieceName::Kknight)),
                 Box::new(Rook::new(true, PieceName::Krook)),
+                
+                // Black pieces
                 Box::new(Pawn::new(false, PieceName::Apawn)),
                 Box::new(Pawn::new(false, PieceName::Bpawn)),
                 Box::new(Pawn::new(false, PieceName::Cpawn)),
@@ -51,13 +69,14 @@ impl Board {
                 Box::new(Pawn::new(false, PieceName::Gpawn)),
                 Box::new(Pawn::new(false, PieceName::Hpawn)),
                 Box::new(Rook::new(false, PieceName::Qrook)),
-                // Box::new(Piece {name: PieceName::Qknight, white: false, role: Role::Knight, cell: Cell {file: 'b', row: 8}},
-                // Box::new(Piece {name: PieceName::Qbishop, white: false, role: Role::Bishop, cell: Cell {file: 'c', row: 8}},
-                // Box::new(Piece {name: PieceName::Queen, white: false, role: Role::Queen, cell: Cell {file: 'd', row: 8}},
-                // Box::new(Piece {name: PieceName::King, white: false, role: Role::King, cell: Cell {file: 'e', row: 8}},
-                // Box::new(Piece {name: PieceName::Kbishop, white: false, role: Role::Bishop, cell: Cell {file: 'f', row: 8}},
-                // Box::new(Piece {name: PieceName::Kknight, white: false, role: Role::Knight, cell: Cell {file: 'g', row: 8}},
+                Box::new(Knight::new(false, PieceName::Qknight)),
+                // Box::new(Bishop::new(true, PieceName::Qbishop)),
+                // Box::new(Queen::new(true, PieceName::Queen)),
+                // Box::new(King::new(true, PieceName::King)),
+                // Box::new(Bishop::new(true, PieceName::Kbishop)),
+                Box::new(Knight::new(false, PieceName::Kknight)),
                 Box::new(Rook::new(false, PieceName::Krook)),
+                
             ]
         }
     }
@@ -143,7 +162,7 @@ mod tests {
     }
 
     #[test]
-    fn test_move_piece() {
+    fn test_move_pawn() {
         let mut board = Board::new();
         let new_cell = Cell::new("b3");
         board.move_piece(PieceName::Bpawn, true, &new_cell);
@@ -154,6 +173,33 @@ mod tests {
                 assert!(piece.has_moved());
             },
             None => assert!(false)
+        }
+    }
+
+    #[test]
+    fn test_move_knight() {
+        let mut board = Board::new();
+        println!("new");
+        board.dump();
+        
+        let new_cell = Cell::new("a3");
+        board.move_piece(PieceName::Qknight, true, &new_cell);
+        println!("moved");
+        board.dump();
+        match board.get_piece_at_cell(&new_cell) {
+            Some(piece) => {
+                assert_eq!(piece.get_name(), PieceName::Qknight);
+                assert!(piece.is_white());
+                assert!(piece.has_moved());
+            },
+            None => assert!(false)
+        }
+
+        match board.get_piece_at_cell(&Cell::new("b1")) {
+            Some(_piece) => {
+                panic!("Did not expect to find a piece")
+            },
+            None => assert!(true)
         }
     }
 }

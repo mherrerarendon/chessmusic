@@ -42,8 +42,8 @@ impl Rook {
     fn init_cell(white: bool, name: PieceName) -> Cell {
         let row = if white {1} else {8};
         let file = match name {
-            PieceName::Krook => 'a',
-            PieceName::Qrook => 'h',
+            PieceName::Krook => 'h',
+            PieceName::Qrook => 'a',
             _ => panic!("Not a rook")
         };
         Cell {file: file, row: row}
