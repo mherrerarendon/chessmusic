@@ -1,6 +1,6 @@
 use super::types::{PieceName, Role};
 use super::cell::Cell;
-use super::piece::{Piece, add_cell_if_valid};
+use super::piece::{Piece};
 use super::board::Board;
 use super::chess_move::Move;
 
@@ -30,7 +30,7 @@ impl Piece for Pawn {
 }
 
 impl Pawn {
-    fn new(white: bool, name: PieceName) -> Pawn {
+    pub fn new(white: bool, name: PieceName) -> Pawn {
         Pawn {
             name: name, 
             white: white, 
@@ -57,23 +57,46 @@ impl Pawn {
         cell
     }
 
+    fn add_cell_if_valid(&self, board: &Board, cell: Option<Cell>, needs_empty: bool, mut valid_cells: Vec<Cell>) -> Vec<Cell> {
+        match cell {
+            Some(cell) => {
+                match board.get_piece_at_cell(&cell) {
+                    Some(_piece) => {
+                        if !needs_empty {
+                            valid_cells.push(cell)
+                        }
+                    },
+                    None => {
+                        if needs_empty {
+                            valid_cells.push(cell)
+                        }
+                    }
+                }
+            },
+            None => ()
+    
+        }
+    
+        valid_cells
+    }
+
     fn get_valid_cells(&self, board: &Board) -> Vec<Cell> {
         let mut valid_cells: Vec<Cell> = Vec::new();
         let direction = if self.white {1} else {-1};
         if self.first_move {
             let double_forward_cell_option = Cell::new_from_cell(&self.cell, 0, 2 * direction);
-            valid_cells = add_cell_if_valid(board, double_forward_cell_option, true, valid_cells);
+            valid_cells = self.add_cell_if_valid(board, double_forward_cell_option, true, valid_cells);
         }
         else {
             let take_left_cell_option = Cell::new_from_cell(&self.cell, -1, 1 * direction);
-            valid_cells = add_cell_if_valid(board, take_left_cell_option, false, valid_cells);
+            valid_cells = self.add_cell_if_valid(board, take_left_cell_option, false, valid_cells);
 
             let take_right_cell_option = Cell::new_from_cell(&self.cell, -1, 1 * direction);
-            valid_cells = add_cell_if_valid(board, take_right_cell_option, false, valid_cells);
+            valid_cells = self.add_cell_if_valid(board, take_right_cell_option, false, valid_cells);
         }
 
         let double_forward_cell_option = Cell::new_from_cell(&self.cell, 0, 1 * direction);
-        valid_cells = add_cell_if_valid(board, double_forward_cell_option, true, valid_cells);
+        valid_cells = self.add_cell_if_valid(board, double_forward_cell_option, true, valid_cells);
 
         valid_cells
     }
@@ -82,7 +105,6 @@ impl Pawn {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::game::Game;
 
     #[test]
     fn test_valid_simple_white_move() {
@@ -92,7 +114,7 @@ mod tests {
                 assert!(pawn.is_valid_move(&board, &Move::parse("a3")));
                 assert!(pawn.is_valid_move(&board, &Move::parse("a4")));
             },
-            None => ()
+            None => panic!("expected to find piece")
         }
     }
 
@@ -104,7 +126,7 @@ mod tests {
                 assert!(pawn.is_valid_move(&board, &Move::parse("a6")));
                 assert!(pawn.is_valid_move(&board, &Move::parse("a5")));
             },
-            None => ()
+            None => panic!("expected to find piece")
         }
     }
 

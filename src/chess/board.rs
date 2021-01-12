@@ -4,6 +4,7 @@ use super::types::{Role, PieceName};
 use super::cell::Cell;
 use super::piece::{Piece};
 use super::pawn::Pawn;
+use super::rook::Rook;
 
 
 pub struct Board {
@@ -11,41 +12,52 @@ pub struct Board {
 }
 
 impl Board {
+    pub fn new_rook_test() -> Board {
+        Board {
+            pieces: vec![
+                Box::new(Rook::new(true, PieceName::Qrook)),
+                Box::new(Rook::new(true, PieceName::Krook)),
+                Box::new(Rook::new(false, PieceName::Qrook)),
+                Box::new(Rook::new(false, PieceName::Qrook)),
+            ]
+        }
+    }
+
     pub fn new() -> Board {
         Board {
             pieces: vec![
-                Box::new(Pawn {name: PieceName::Apawn, white: true, role: Role::Pawn, cell: Cell {file: 'a', row: 2}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Bpawn, white: true, role: Role::Pawn, cell: Cell {file: 'b', row: 2}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Cpawn, white: true, role: Role::Pawn, cell: Cell {file: 'c', row: 2}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Dpawn, white: true, role: Role::Pawn, cell: Cell {file: 'd', row: 2}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Epawn, white: true, role: Role::Pawn, cell: Cell {file: 'e', row: 2}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Fpawn, white: true, role: Role::Pawn, cell: Cell {file: 'f', row: 2}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Gpawn, white: true, role: Role::Pawn, cell: Cell {file: 'g', row: 2}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Hpawn, white: true, role: Role::Pawn, cell: Cell {file: 'h', row: 2}, first_move: true}),
-                // Box::new(NotPawn {name: PieceName::Qrook, white: true, role: Role::Rook, cell: Cell {file: 'a', row: 1}, first_move: true}),
+                Box::new(Pawn::new(true, PieceName::Apawn)),
+                Box::new(Pawn::new(true, PieceName::Bpawn)),
+                Box::new(Pawn::new(true, PieceName::Cpawn)),
+                Box::new(Pawn::new(true, PieceName::Dpawn)),
+                Box::new(Pawn::new(true, PieceName::Epawn)),
+                Box::new(Pawn::new(true, PieceName::Fpawn)),
+                Box::new(Pawn::new(true, PieceName::Gpawn)),
+                Box::new(Pawn::new(true, PieceName::Hpawn)),
+                Box::new(Rook::new(true, PieceName::Qrook)),
                 // Box::new(Piece {name: PieceName::Qknight, white: true, role: Role::Knight, cell: Cell {file: 'b', row: 1}},
                 // Box::new(Piece {name: PieceName::Qbishop, white: true, role: Role::Bishop, cell: Cell {file: 'c', row: 1}},
                 // Box::new(Piece {name: PieceName::Queen, white: true, role: Role::Queen, cell: Cell {file: 'd', row: 1}},
                 // Box::new(Piece {name: PieceName::King, white: true, role: Role::King, cell: Cell {file: 'e', row: 1}},
                 // Box::new(Piece {name: PieceName::Kbishop, white: true, role: Role::Bishop, cell: Cell {file: 'f', row: 1}},
                 // Box::new(Piece {name: PieceName::Kknight, white: true, role: Role::Knight, cell: Cell {file: 'g', row: 1}},
-                // Box::new(Piece {name: PieceName::Krook, white: true, role: Role::Rook, cell: Cell {file: 'h', row: 1}},
-                Box::new(Pawn {name: PieceName::Apawn, white: false, role: Role::Pawn, cell: Cell {file: 'a', row: 7}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Bpawn, white: false, role: Role::Pawn, cell: Cell {file: 'b', row: 7}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Cpawn, white: false, role: Role::Pawn, cell: Cell {file: 'c', row: 7}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Dpawn, white: false, role: Role::Pawn, cell: Cell {file: 'd', row: 7}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Epawn, white: false, role: Role::Pawn, cell: Cell {file: 'e', row: 7}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Fpawn, white: false, role: Role::Pawn, cell: Cell {file: 'f', row: 7}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Gpawn, white: false, role: Role::Pawn, cell: Cell {file: 'g', row: 7}, first_move: true}),
-                Box::new(Pawn {name: PieceName::Hpawn, white: false, role: Role::Pawn, cell: Cell {file: 'h', row: 7}, first_move: true}),
-                // Box::new(Piece {name: PieceName::Qrook, white: false, role: Role::Rook, cell: Cell {file: 'a', row: 8}},
+                Box::new(Rook::new(true, PieceName::Krook)),
+                Box::new(Pawn::new(false, PieceName::Apawn)),
+                Box::new(Pawn::new(false, PieceName::Bpawn)),
+                Box::new(Pawn::new(false, PieceName::Cpawn)),
+                Box::new(Pawn::new(false, PieceName::Dpawn)),
+                Box::new(Pawn::new(false, PieceName::Epawn)),
+                Box::new(Pawn::new(false, PieceName::Fpawn)),
+                Box::new(Pawn::new(false, PieceName::Gpawn)),
+                Box::new(Pawn::new(false, PieceName::Hpawn)),
+                Box::new(Rook::new(false, PieceName::Qrook)),
                 // Box::new(Piece {name: PieceName::Qknight, white: false, role: Role::Knight, cell: Cell {file: 'b', row: 8}},
                 // Box::new(Piece {name: PieceName::Qbishop, white: false, role: Role::Bishop, cell: Cell {file: 'c', row: 8}},
                 // Box::new(Piece {name: PieceName::Queen, white: false, role: Role::Queen, cell: Cell {file: 'd', row: 8}},
                 // Box::new(Piece {name: PieceName::King, white: false, role: Role::King, cell: Cell {file: 'e', row: 8}},
                 // Box::new(Piece {name: PieceName::Kbishop, white: false, role: Role::Bishop, cell: Cell {file: 'f', row: 8}},
                 // Box::new(Piece {name: PieceName::Kknight, white: false, role: Role::Knight, cell: Cell {file: 'g', row: 8}},
-                // Box::new(Piece {name: PieceName::Krook, white: false, role: Role::Rook, cell: Cell {file: 'h', row: 8}}
+                Box::new(Rook::new(false, PieceName::Krook)),
             ]
         }
     }
