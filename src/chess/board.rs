@@ -8,6 +8,7 @@ use super::rook::Rook;
 use super::knight::Knight;
 use super::bishop::Bishop;
 use super::queen::Queen;
+use super::king::King;
 
 
 pub struct Board {
@@ -29,11 +30,20 @@ impl Board {
         }
     }
 
+    pub fn new_king_test() -> Board {
+        Board {
+            pieces: vec![
+                Box::new(King::new(true)),
+                Box::new(King::new(false)),
+            ]
+        }
+    }
+
     pub fn new_queen_test() -> Board {
         Board {
             pieces: vec![
-                Box::new(Queen::new(true, PieceName::Queen)),
-                Box::new(Queen::new(false, PieceName::Queen)),
+                Box::new(Queen::new(true)),
+                Box::new(Queen::new(false)),
             ]
         }
     }
@@ -75,8 +85,8 @@ impl Board {
                 Box::new(Rook::new(true, PieceName::Qrook)),
                 Box::new(Knight::new(true, PieceName::Qknight)),
                 Box::new(Bishop::new(true, PieceName::Qbishop)),
-                Box::new(Queen::new(true, PieceName::Queen)),
-                // Box::new(King::new(true, PieceName::King)),
+                Box::new(Queen::new(true)),
+                Box::new(King::new(true)),
                 Box::new(Bishop::new(true, PieceName::Kbishop)),
                 Box::new(Knight::new(true, PieceName::Kknight)),
                 Box::new(Rook::new(true, PieceName::Krook)),
@@ -92,10 +102,10 @@ impl Board {
                 Box::new(Pawn::new(false, PieceName::Hpawn)),
                 Box::new(Rook::new(false, PieceName::Qrook)),
                 Box::new(Knight::new(false, PieceName::Qknight)),
-                Box::new(Bishop::new(true, PieceName::Qbishop)),
-                Box::new(Queen::new(true, PieceName::Queen)),
-                // Box::new(King::new(true, PieceName::King)),
-                Box::new(Bishop::new(true, PieceName::Kbishop)),
+                Box::new(Bishop::new(false, PieceName::Qbishop)),
+                Box::new(Queen::new(false)),
+                Box::new(King::new(false)),
+                Box::new(Bishop::new(false, PieceName::Kbishop)),
                 Box::new(Knight::new(false, PieceName::Kknight)),
                 Box::new(Rook::new(false, PieceName::Krook)),
                 

@@ -29,17 +29,17 @@ impl Piece for Queen {
 }
 
 impl Queen {
-    pub fn new(white: bool, name: PieceName) -> Queen {
+    pub fn new(white: bool) -> Queen {
         Queen {
-            name: name, 
+            name: PieceName::Queen, 
             white: white, 
-            role: Role::Bishop, 
+            role: Role::Queen, 
             first_move: true, 
-            cell: Queen::init_cell(white, name)
+            cell: Queen::init_cell(white)
         }
     }
 
-    fn init_cell(white: bool, name: PieceName) -> Cell {
+    fn init_cell(white: bool) -> Cell {
         let row = if white {1} else {8};
         let file = 'd';
         Cell {file: file, row: row}
