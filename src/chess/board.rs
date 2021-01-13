@@ -7,6 +7,7 @@ use super::pawn::Pawn;
 use super::rook::Rook;
 use super::knight::Knight;
 use super::bishop::Bishop;
+use super::queen::Queen;
 
 
 pub struct Board {
@@ -25,6 +26,15 @@ impl Board {
                 }
             }
             println!("{:?}{:?}", the_line, row);
+        }
+    }
+
+    pub fn new_queen_test() -> Board {
+        Board {
+            pieces: vec![
+                Box::new(Queen::new(true, PieceName::Queen)),
+                Box::new(Queen::new(false, PieceName::Queen)),
+            ]
         }
     }
 
@@ -65,7 +75,7 @@ impl Board {
                 Box::new(Rook::new(true, PieceName::Qrook)),
                 Box::new(Knight::new(true, PieceName::Qknight)),
                 Box::new(Bishop::new(true, PieceName::Qbishop)),
-                // Box::new(Queen::new(true, PieceName::Queen)),
+                Box::new(Queen::new(true, PieceName::Queen)),
                 // Box::new(King::new(true, PieceName::King)),
                 Box::new(Bishop::new(true, PieceName::Kbishop)),
                 Box::new(Knight::new(true, PieceName::Kknight)),
@@ -83,7 +93,7 @@ impl Board {
                 Box::new(Rook::new(false, PieceName::Qrook)),
                 Box::new(Knight::new(false, PieceName::Qknight)),
                 Box::new(Bishop::new(true, PieceName::Qbishop)),
-                // Box::new(Queen::new(true, PieceName::Queen)),
+                Box::new(Queen::new(true, PieceName::Queen)),
                 // Box::new(King::new(true, PieceName::King)),
                 Box::new(Bishop::new(true, PieceName::Kbishop)),
                 Box::new(Knight::new(false, PieceName::Kknight)),
