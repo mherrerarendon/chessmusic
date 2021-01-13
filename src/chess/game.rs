@@ -18,6 +18,14 @@ impl Game {
         }
     }
 
+    pub fn new_test(role: Role) -> Game {
+        match role {
+            Role::Rook => Game {board: Board::new_rook_test()},
+            Role::Bishop => Game {board: Board::new_bishop_test()},
+            _ => panic!("no test board for specified role")
+        }
+    }
+
     fn new_with_pgn(pgn: &str) -> Game {
         // TODO: 
         Game::new()
@@ -97,6 +105,32 @@ mod tests {
         game.add_move(&Move::parse("d4"), &Move::parse("e5"));
         let name = game.get_piece_for_move(true, &Move::parse("dxe5")).unwrap();
         assert_eq!(name, PieceName::Dpawn);
+    }
+
+    #[test]
+    fn test_get_piece_for_bishop_move() {
+        let game = Game::new_test(Role::Bishop);
+        let name = game.get_piece_for_move(true, &Move::parse("Bf4")).unwrap();
+        assert_eq!(name, PieceName::Qbishop);
+
+        let name = game.get_piece_for_move(true, &Move::parse("Bb5")).unwrap();
+        assert_eq!(name, PieceName::Kbishop);
+
+        let name = game.get_piece_for_move(false, &Move::parse("Ba6")).unwrap();
+        assert_eq!(name, PieceName::Qbishop);
+
+        let name = game.get_piece_for_move(false, &Move::parse("Ba3")).unwrap();
+        assert_eq!(name, PieceName::Kbishop);
+    }
+
+    #[test]
+    fn test_get_piece_for_knight_move() {
+        let game = Game::new();
+    }
+
+    #[test]
+    fn test_get_piece_for_rook_move() {
+        let game = Game::new_test(Role::Rook);
     }
 
     #[test]
