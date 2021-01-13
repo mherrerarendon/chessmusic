@@ -111,4 +111,28 @@ mod tests {
             None => panic!("expected to find piece")
         }
     }
+
+    #[test]
+    fn test_black_k_knight_moves() {
+        let mut board = Board::new();
+        
+        match board.get_piece_at_cell(&Cell::new("g8")) {
+            Some(knight) => {
+                assert!(knight.is_valid_move(&board, &Move::parse("h6")));
+                assert!(knight.is_valid_move(&board, &Move::parse("f6")));
+            },
+            None => panic!("expected to find piece")
+        }
+
+        let new_cell = Cell::new("h6");
+        board.move_piece(PieceName::Kknight, false, &new_cell);
+        match board.get_piece_at_cell(&new_cell) {
+            Some(knight) => {
+                assert!(knight.is_valid_move(&board, &Move::parse("g8")));
+                assert!(knight.is_valid_move(&board, &Move::parse("f5")));
+                assert!(!knight.is_valid_move(&board, &Move::parse("g6")));
+            },
+            None => panic!("expected to find piece")
+        }
+    }
 }

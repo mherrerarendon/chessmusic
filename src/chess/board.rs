@@ -6,6 +6,7 @@ use super::piece::{Piece};
 use super::pawn::Pawn;
 use super::rook::Rook;
 use super::knight::Knight;
+use super::bishop::Bishop;
 
 
 pub struct Board {
@@ -13,6 +14,20 @@ pub struct Board {
 }
 
 impl Board {
+    pub fn dump(&self) {
+        for row in 1..=8 {
+            let mut the_line = String::new();
+            for file in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].iter() {
+                let cell = Cell {file: *file, row: row};
+                match self.get_piece_at_cell(&cell) {
+                    Some(_piece) => the_line.push('.'),
+                    None => the_line.push(' ')
+                }
+            }
+            println!("{:?}{:?}", the_line, row);
+        }
+    }
+
     pub fn new_rook_test() -> Board {
         Board {
             pieces: vec![
@@ -24,17 +39,14 @@ impl Board {
         }
     }
 
-    fn dump(&self) {
-        for row in 1..=8 {
-            let mut the_line = String::new();
-            for file in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].iter() {
-                let cell = Cell {file: *file, row: row};
-                match self.get_piece_at_cell(&cell) {
-                    Some(_piece) => the_line.push('.'),
-                    None => the_line.push(' ')
-                }
-            }
-            println!("{:?}{:?}", the_line, row);
+    pub fn new_bishop_test() -> Board {
+        Board {
+            pieces: vec![
+                Box::new(Bishop::new(true, PieceName::Qbishop)),
+                Box::new(Bishop::new(true, PieceName::Kbishop)),
+                Box::new(Bishop::new(false, PieceName::Qbishop)),
+                Box::new(Bishop::new(false, PieceName::Kbishop)),
+            ]
         }
     }
 
@@ -52,10 +64,10 @@ impl Board {
                 Box::new(Pawn::new(true, PieceName::Hpawn)),
                 Box::new(Rook::new(true, PieceName::Qrook)),
                 Box::new(Knight::new(true, PieceName::Qknight)),
-                // Box::new(Bishop::new(true, PieceName::Qbishop)),
+                Box::new(Bishop::new(true, PieceName::Qbishop)),
                 // Box::new(Queen::new(true, PieceName::Queen)),
                 // Box::new(King::new(true, PieceName::King)),
-                // Box::new(Bishop::new(true, PieceName::Kbishop)),
+                Box::new(Bishop::new(true, PieceName::Kbishop)),
                 Box::new(Knight::new(true, PieceName::Kknight)),
                 Box::new(Rook::new(true, PieceName::Krook)),
                 
@@ -70,10 +82,10 @@ impl Board {
                 Box::new(Pawn::new(false, PieceName::Hpawn)),
                 Box::new(Rook::new(false, PieceName::Qrook)),
                 Box::new(Knight::new(false, PieceName::Qknight)),
-                // Box::new(Bishop::new(true, PieceName::Qbishop)),
+                Box::new(Bishop::new(true, PieceName::Qbishop)),
                 // Box::new(Queen::new(true, PieceName::Queen)),
                 // Box::new(King::new(true, PieceName::King)),
-                // Box::new(Bishop::new(true, PieceName::Kbishop)),
+                Box::new(Bishop::new(true, PieceName::Kbishop)),
                 Box::new(Knight::new(false, PieceName::Kknight)),
                 Box::new(Rook::new(false, PieceName::Krook)),
                 
