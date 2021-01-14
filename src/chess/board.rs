@@ -18,16 +18,18 @@ pub struct Board {
 impl Board {
     pub fn dump(&self) {
         for row in 1..=8 {
+            let chess_row = 9-row;
             let mut the_line = String::new();
             for file in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].iter() {
-                let cell = Cell {file: *file, row: row};
+                let cell = Cell {file: *file, row: chess_row};
                 match self.get_piece_at_cell(&cell) {
-                    Some(_piece) => the_line.push('.'),
-                    None => the_line.push(' ')
+                    Some(piece) => the_line.push(piece.get_char_representation()),
+                    None => the_line.push('.')
                 }
             }
-            println!("{:?}{:?}", the_line, row);
+            println!("{:?} {}", chess_row, the_line);
         }
+        println!("\n  abcdefgh");
     }
 
     pub fn new_king_test() -> Board {
@@ -211,13 +213,8 @@ mod tests {
     #[test]
     fn test_move_knight() {
         let mut board = Board::new();
-        println!("new");
-        board.dump();
-        
         let new_cell = Cell::new("a3");
         board.move_piece(PieceName::Qknight, true, &new_cell);
-        println!("moved");
-        board.dump();
         match board.get_piece_at_cell(&new_cell) {
             Some(piece) => {
                 assert_eq!(piece.get_name(), PieceName::Qknight);

@@ -17,6 +17,7 @@ impl Piece for Knight {
     fn get_name(&self) -> PieceName {self.name}
     fn is_white(&self) -> bool {self.white}
     fn get_role(&self) -> Role {self.role}
+    fn get_char_representation(&self) -> char {if self.white {'N'} else {'n'}}
     fn get_curr_cell(&self) -> &Cell {&self.cell}
     fn set_new_cell(&mut self, cell: &Cell) {self.cell = cell.clone()}
     fn has_moved(&self) -> bool {!self.first_move}

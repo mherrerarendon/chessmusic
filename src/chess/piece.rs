@@ -9,6 +9,7 @@ pub trait Piece {
     fn is_white(&self) -> bool;
     fn get_role(&self) -> Role;
     fn get_curr_cell(&self) -> &Cell;
+    fn get_char_representation(&self) -> char;
     fn set_new_cell(&mut self, cell: &Cell); 
 
     fn has_moved(&self) -> bool;
