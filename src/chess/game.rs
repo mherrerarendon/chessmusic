@@ -18,28 +18,13 @@ impl Game {
         }
     }
 
+    #[cfg(test)]
     pub fn new_test(role: Role) -> Game {
         match role {
             Role::Rook => Game {board: Board::new_rook_test()},
             Role::Bishop => Game {board: Board::new_bishop_test()},
             _ => panic!("no test board for specified role")
         }
-    }
-
-    fn new_with_pgn(pgn: &str) -> Game {
-        // TODO: 
-        Game::new()
-    } 
-
-    fn new_with_game_id(game_id: &str) -> Game {
-        // TODO: 
-        Game::new()
-    } 
-
-    fn new_with_moves(moves: &Vec<(Move, Move)>) -> Game {
-        let mut game = Game::new();
-        game.add_moves(moves);
-        game
     }
 
     fn get_piece_for_move(&self, white: bool, the_move: &Move) -> Result<PieceName, Box<dyn Error>> {

@@ -6,18 +6,18 @@ use std::io::{stdin, stdout, Write};
 use std::thread::sleep;
 use std::time::Duration;
 
-struct MidiPlayer {
+pub struct MidiPlayer {
     conn_out: MidiOutputConnection
 }
 
 impl MidiPlayer {
-    fn new() -> MidiPlayer {
+    pub fn new() -> MidiPlayer {
         MidiPlayer {
             conn_out: MidiPlayer::get_conn_out()
         }
     }
 
-    fn play_note(&mut self, note: u8) {
+    pub fn play_note(&mut self, note: u8) {
         let duration = 4;
         const NOTE_ON_MSG: u8 = 0x90;
         const NOTE_OFF_MSG: u8 = 0x80;

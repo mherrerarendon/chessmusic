@@ -26,6 +26,7 @@ impl Board {
         println!("\n  abcdefgh");
     }
 
+    #[cfg(test)]
     pub fn new_king_test() -> Board {
         Board {
             pieces: vec![
@@ -35,6 +36,7 @@ impl Board {
         }
     }
 
+    #[cfg(test)]
     pub fn new_queen_test() -> Board {
         Board {
             pieces: vec![
@@ -44,6 +46,7 @@ impl Board {
         }
     }
 
+    #[cfg(test)]
     pub fn new_rook_test() -> Board {
         Board {
             pieces: vec![
@@ -143,9 +146,22 @@ impl Board {
         return self.pieces.iter().filter(|piece| piece.get_role() == role && piece.is_white() == white).collect();
     }
 
+    fn remove_piece_at_cell(&mut self, cell: &Cell) {
+        match self.get_piece_at_cell(&cell) {
+            Some(piece) => {
+                let index = self.pieces.iter()
+                    .position(|x| (x.get_name() == piece.get_name() && x.is_white() == piece.is_white())).unwrap();
+                self.pieces.remove(index);
+            },
+            None => () // Cell was empty, nothing to do
+        }
+    }
+
     pub fn move_piece(&mut self, name: PieceName, white: bool, cell: &Cell) {
+        self.remove_piece_at_cell(cell);
         match self.get_mut_piece_with_name(name, white) {
             Some(piece) => {
+                
                 piece.set_new_cell(&cell);
                 piece.set_has_moved();
             },
@@ -222,6 +238,17 @@ mod tests {
             Some(_piece) => {
                 panic!("Did not expect to find a piece")
             },
+            None => assert!(true)
+        }
+    }
+
+    #[test]
+    fn test_remove_piece() {
+        let mut board = Board::new();
+        let cell = Cell::new("a1");
+        board.remove_piece_at_cell(&cell);
+        match board.get_piece_at_cell(&cell) {
+            Some(piece) => panic!("Did not expect to find piece"),
             None => assert!(true)
         }
     }

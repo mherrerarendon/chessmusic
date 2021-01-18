@@ -36,6 +36,7 @@ impl Move {
         return the_move;
     }
 
+    // TODO: promotion ("=") and check mate ("#")
     fn parse_non_castle_move(move_str: &str) -> Move {
         let clean_move_str: String = move_str.chars().filter(|&x| x != 'x' && x != '+' && x != '#').collect();
         let mut the_move: Move = Move::new();
@@ -74,11 +75,17 @@ impl Move {
             return Move::parse_non_castle_move(move_str);
         }
     }
+
+    pub fn parse_moves(moves: &Vec<(&str, &str)>) -> Vec<(Move, Move)> {
+        let new_moves: Vec<(Move, Move)> = moves.iter().map(|x| (Move::parse(x.0), Move::parse(x.1))).collect();
+        new_moves
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::super::super::pgn;
 
     #[test]
     fn test_parse_simple_pawn_move() {
@@ -164,4 +171,5 @@ mod tests {
         assert_eq!(the_move.file_hint, ' ');
         assert_eq!(the_move.check, false);
     }
+
 }

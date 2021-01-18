@@ -52,7 +52,7 @@ impl Pitch {
         }
     }
 
-    fn as_midi(&self) -> i32 {
+    pub fn as_midi(&self) -> i32 {
         self.base_midi + self.adjustment
     }
 
@@ -68,9 +68,9 @@ impl Pitch {
         new_name
     }
 
-    pub fn get_pitches_from_cell_history(cell_history: &Vec<&Cell>) -> Vec<Pitch> {
+    pub fn get_pitches_from_cell_history(cell_history: &Vec<Cell>) -> Vec<Pitch> {
         let base_cell = cell_history[0];
-        let base_pitch = Pitch::new_with_cell(base_cell);
+        let base_pitch = Pitch::new_with_cell(&base_cell);
         let mut pitches = vec![base_pitch];
 
         for cell in cell_history[1..].iter() {
