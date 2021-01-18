@@ -1,7 +1,22 @@
+pub mod bishop;
+pub mod king;
+pub mod knight;
+pub mod pawn;
+pub mod queen;
+pub mod rook;
+
 use super::cell::Cell;
 use super::types::{Role, PieceName};
 use super::board::Board;
 use super::chess_move::Move;
+
+pub use bishop::Bishop as Bishop;
+pub use king::King as King;
+pub use knight::Knight as Knight;
+pub use pawn::Pawn as Pawn;
+pub use queen::Queen as Queen;
+pub use rook::Rook as Rook;
+
 
 pub trait Piece {
     // common data

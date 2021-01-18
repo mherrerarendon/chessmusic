@@ -1,8 +1,8 @@
-use super::types::{PieceName, Role};
-use super::cell::Cell;
-use super::piece::{Piece};
-use super::board::Board;
-use super::chess_move::Move;
+use super::super::types::{PieceName, Role};
+use super::super::cell::Cell;
+use super::Piece;
+use super::super::board::Board;
+use super::super::chess_move::Move;
 
 
 pub struct Rook {

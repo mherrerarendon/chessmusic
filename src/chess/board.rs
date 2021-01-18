@@ -2,13 +2,7 @@ use std::collections::HashMap;
 use std::{error::Error};
 use super::types::{Role, PieceName};
 use super::cell::Cell;
-use super::piece::{Piece};
-use super::pawn::Pawn;
-use super::rook::Rook;
-use super::knight::Knight;
-use super::bishop::Bishop;
-use super::queen::Queen;
-use super::king::King;
+use super::piece::{Piece, Bishop, King, Knight, Pawn, Queen, Rook};
 
 
 pub struct Board {
