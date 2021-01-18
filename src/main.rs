@@ -1,6 +1,7 @@
 mod lichess;
 mod pgn;
 mod chess;
+mod music;
 
 use std::{error::Error, vec};
 

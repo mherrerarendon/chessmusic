@@ -33,6 +33,18 @@ impl Cell {
         Some(new_file)
     }
 
+    fn offset_from_file(curr_file: char, new_file: char) -> i32 {
+        let curr_char_as_digit = curr_file as i32;
+        let new_char_as_digit = new_file as i32;
+        new_char_as_digit - curr_char_as_digit
+    }
+
+    pub fn get_cell_diff(&self, cell: &Cell) -> (i32, i32) {
+        let x_diff = Cell::offset_from_file(self.file, cell.file);
+        let y_diff = cell.row - self.row;
+        (x_diff, y_diff)
+    }
+
     pub fn new_from_cell(cell: &Cell, file_offset: i32, row_offset: i32) -> Option<Cell> {
         let new_row = cell.row + row_offset;
         if new_row  < 1 || new_row > 8 {
@@ -148,5 +160,45 @@ mod tests {
     fn test_new_cell() {
         let cell = Cell::new("a1");
         assert_eq!(cell, Cell {file: 'a', row: 1});
+    }
+
+    #[test]
+    fn test_get_cell_positive_diff() {
+        let base_cell = Cell::new("a1");
+        let (x, y) = base_cell.get_cell_diff(&Cell::new("b2"));
+        assert_eq!(x, 1);
+        assert_eq!(y, 1);
+
+        let (x, y) = base_cell.get_cell_diff(&Cell::new("h8"));
+        assert_eq!(x, 7);
+        assert_eq!(y, 7);
+
+        let (x, y) = base_cell.get_cell_diff(&Cell::new("a8"));
+        assert_eq!(x, 0);
+        assert_eq!(y, 7);
+
+        let (x, y) = base_cell.get_cell_diff(&Cell::new("h1"));
+        assert_eq!(x, 7);
+        assert_eq!(y, 0);
+    }
+
+    #[test]
+    fn test_get_cell_negative_diff() {
+        let base_cell = Cell::new("h8");
+        let (x, y) = base_cell.get_cell_diff(&Cell::new("g7"));
+        assert_eq!(x, -1);
+        assert_eq!(y, -1);
+
+        let (x, y) = base_cell.get_cell_diff(&Cell::new("a1"));
+        assert_eq!(x, -7);
+        assert_eq!(y, -7);
+
+        let (x, y) = base_cell.get_cell_diff(&Cell::new("h1"));
+        assert_eq!(x, 0);
+        assert_eq!(y, -7);
+
+        let (x, y) = base_cell.get_cell_diff(&Cell::new("a8"));
+        assert_eq!(x, -7);
+        assert_eq!(y, 0);
     }
 }

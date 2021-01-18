@@ -36,6 +36,12 @@ impl Game {
         Game::new()
     } 
 
+    fn new_with_moves(moves: &Vec<(Move, Move)>) -> Game {
+        let mut game = Game::new();
+        game.add_moves(moves);
+        game
+    }
+
     fn get_piece_for_move(&self, white: bool, the_move: &Move) -> Result<PieceName, Box<dyn Error>> {
         let role = the_move.role;
         let pieces_with_role = self.board.get_pieces_with_role(role, white);
@@ -197,8 +203,6 @@ mod tests {
     #[test]
     fn test_real_moves() {
         // 1. d4 Nf6 2. Bf4 Nc6 3. e3 d5 4. Nf3 Bf5 5. Nbd2 e6 6. c3 Bd6 7. Bg5 h6 8. Bh4 g5 9. Bg3 Ne4 10. Nxe4 Bxe4 
-        
-
         let mut game = Game::new();
 
         game.add_move(&Move::parse("d4"), &Move::parse("Nf6"));
@@ -257,6 +261,23 @@ mod tests {
         assert_eq!(*white_piece.get_curr_cell(), Cell::new("h4"));
         assert_eq!(*black_piece.get_curr_cell(), Cell::new("g5"));
 
+        game.add_move(&Move::parse("Bg3"), &Move::parse("Ne4"));
+        game.board.dump();
+        let white_piece = game.board.get_piece_with_name(PieceName::Qbishop, true).unwrap();
+        let black_piece = game.board.get_piece_with_name(PieceName::Kknight, false).unwrap();
+        assert_eq!(*white_piece.get_curr_cell(), Cell::new("g3"));
+        assert_eq!(*black_piece.get_curr_cell(), Cell::new("e4"));
+
+        game.add_move(&Move::parse("Nxe4"), &Move::parse("Bxe4"));
+        game.board.dump();
+        let white_piece = game.board.get_piece_with_name(PieceName::Qknight, true).unwrap();
+        let black_piece = game.board.get_piece_with_name(PieceName::Qbishop, false).unwrap();
+        assert_eq!(*white_piece.get_curr_cell(), Cell::new("e4"));
+        assert_eq!(*black_piece.get_curr_cell(), Cell::new("e4"));
+    }
+
+    #[test]
+    fn test_bishop_history() {
         let moves = vec![(Move::parse("d4"), Move::parse("Nf6")),   // 1
                                          (Move::parse("Bf4"), Move::parse("Nc6")),   // 2
                                          (Move::parse("e3"), Move::parse("d5")),   // 3
@@ -267,15 +288,18 @@ mod tests {
                                          (Move::parse("Bh4"), Move::parse("g5")),   // 8
                                          (Move::parse("Bg3"), Move::parse("Ne4")),   // 9
                                          (Move::parse("Nxe4"), Move::parse("Bxe4")),]; // 10
-
-        // game.add_move(&moves[1].0, &moves[1].1);
-        // game.add_move(&moves[2].0, &moves[2].1);
-        // game.add_move(&moves[3].0, &moves[3].1);
-        // game.add_move(&moves[4].0, &moves[4].1);
-        // game.add_move(&moves[5].0, &moves[5].1);
-        // game.add_move(&moves[6].0, &moves[6].1);
-        // game.add_move(&moves[7].0, &moves[7].1);
-        // game.add_move(&moves[8].0, &moves[8].1);
-        // game.add_move(&moves[9].0, &moves[9].1);
+        let white_q_bishop_history = Game::get_piece_history(PieceName::Qbishop, true, &moves);
+        assert_eq!(white_q_bishop_history.len(), 11);
+        assert_eq!(white_q_bishop_history[0], Cell::new("c1"));
+        assert_eq!(white_q_bishop_history[1], Cell::new("c1"));
+        assert_eq!(white_q_bishop_history[2], Cell::new("f4"));
+        assert_eq!(white_q_bishop_history[3], Cell::new("f4"));
+        assert_eq!(white_q_bishop_history[4], Cell::new("f4"));
+        assert_eq!(white_q_bishop_history[5], Cell::new("f4"));
+        assert_eq!(white_q_bishop_history[6], Cell::new("f4"));
+        assert_eq!(white_q_bishop_history[7], Cell::new("g5"));
+        assert_eq!(white_q_bishop_history[8], Cell::new("h4"));
+        assert_eq!(white_q_bishop_history[9], Cell::new("g3"));
+        assert_eq!(white_q_bishop_history[10], Cell::new("g3"));
     }
 }
