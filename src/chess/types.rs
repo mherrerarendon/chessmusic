@@ -1,7 +1,7 @@
 use std::collections::HashMap;
-use super::cell::Cell;
+use std::fmt;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(PartialEq, Eq, Hash, Clone, Copy)]
 pub enum Role {
     Pawn,
     Bishop,
@@ -9,6 +9,22 @@ pub enum Role {
     Rook,
     Queen,
     King
+}
+
+impl fmt::Debug for Role {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let role = match *self {
+            Role::Pawn => "Pawn",
+            Role::Bishop => "Bishop",
+            Role::Knight => "Knight",
+            Role::Rook => "Rook",
+            Role::Queen => "Queen",
+            Role::King => "King"
+        };
+        f.debug_struct("Role")
+         .field("name", &role)
+         .finish()
+    }
 }
 
 pub fn role_char_to_role(role_char: &str) -> Role {
@@ -24,6 +40,7 @@ pub fn role_char_to_role(role_char: &str) -> Role {
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum MoveType {
+    None,
     Simple,
     Take,
     CastleKing,

@@ -1,6 +1,8 @@
 use super::types::{Role, MoveType, role_char_to_role};
 use super::cell::Cell;
 
+use std::fmt;
+
 pub struct Move {
     pub role: Role,
     pub move_type: MoveType,
@@ -9,11 +11,23 @@ pub struct Move {
     pub cell: Cell
 }
 
+impl fmt::Debug for Move {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Move")
+         .field("role", &self.role)
+         .field("move_type", &self.move_type)
+         .field("file_hint", &self.file_hint)
+         .field("check", &self.check)
+         .field("cell", &self.cell)
+         .finish()
+    }
+}
+
 impl Move {
     fn new() -> Move {
         Move {
             role: Role::Pawn,
-            move_type: MoveType::Simple,
+            move_type: MoveType::None,
             file_hint: ' ',
             check: false,
             cell: Cell {file: ' ', row: 0}
@@ -38,28 +52,38 @@ impl Move {
 
     // TODO: promotion ("=") and check mate ("#")
     fn parse_non_castle_move(move_str: &str) -> Move {
+        if move_str == "" {
+            return Move::new();
+        }
+
         let clean_move_str: String = move_str.chars().filter(|&x| x != 'x' && x != '+' && x != '#').collect();
         let mut the_move: Move = Move::new();
         the_move.check = move_str.contains("+");
         if move_str.contains("x") {
             the_move.move_type = MoveType::Take;
         }
+        else {
+            the_move.move_type = MoveType::Simple;
+        }
         
-        // move with file hint "Nbd2"
         let re = regex::Regex::new(r"([RNBQK]?)([a-h]?)([a-h])(\d)").unwrap();
-        let caps = re.captures(&clean_move_str).unwrap();
-        the_move.role = caps.get(1).map_or(Role::Pawn, |m| role_char_to_role(m.as_str()));
-        // if the_move.role == Role::Pawn {
-            match caps.get(2) {
-                Some(m) => {
-                    let file_hint_as_str = m.as_str();
-                    if file_hint_as_str.len() > 0 {
-                        the_move.file_hint = file_hint_as_str.chars().into_iter().next().unwrap();
-                    }
-                },
-                None => ()
+        let caps = match re.captures(&clean_move_str) {
+            Some(caps) => caps,
+            None => {
+                println!("Failed to capture moves from actual: {} clean: {}", move_str, clean_move_str);
+                panic!("Failed to capture moves from actual: {} clean: {}", move_str, clean_move_str);
             }
-        // }
+        };
+        the_move.role = caps.get(1).map_or(Role::Pawn, |m| role_char_to_role(m.as_str()));
+        match caps.get(2) {
+            Some(m) => {
+                let file_hint_as_str = m.as_str();
+                if file_hint_as_str.len() > 0 {
+                    the_move.file_hint = file_hint_as_str.chars().into_iter().next().unwrap();
+                }
+            },
+            None => ()
+        }
         the_move.cell = Cell {
             file: caps.get(3).map_or(' ', |m| m.as_str().chars().next().unwrap()),
             row: caps.get(4).map_or(0, |m| m.as_str().parse::<i32>().unwrap())
