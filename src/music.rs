@@ -1,4 +1,4 @@
-use chess::cell::Cell;
+use chess::cell::{self, Cell};
 
 use crate::chess;
 
@@ -11,49 +11,53 @@ use std::thread::sleep;
 use std::time::Duration;
 
 pub struct Pitch {
-    note_name: char,
-    half_step_adj: i32
+    base_midi: i32,
+    adjustment: i32
 }
 
 impl Pitch {
-    fn new(name: char) -> Pitch {
+    fn new(file: char) -> Pitch {
         Pitch {
-            note_name: name,
-            half_step_adj:0
+            base_midi: Pitch::file_to_midi(file),
+            adjustment: 0
         }
     }
     fn new_with_cell(cell: &Cell) -> Pitch {
-        let mut pitch = Pitch {
-            note_name: cell.file,
-            half_step_adj: cell.row - 1
-        };
-        pitch.normalize_enharmonic();
-        pitch
+        Pitch {
+            base_midi: Pitch::file_to_midi(cell.file),
+            adjustment: cell.row - 1
+        }
     }
 
     // transposition is x and y on a chess board
     fn new_with_cell_diff(&self, cell_diff: (i32, i32)) -> Pitch {
         let (x, y) = cell_diff;
-        let mut pitch = Pitch {
-            note_name: Pitch::note_name_with_offset(self.note_name, y),
-            half_step_adj: self.half_step_adj + x
-        };
-        pitch.normalize_enharmonic();
-        pitch
-    }
-
-    fn as_midi(&self) -> i32 {
-        
-    }
-
-    fn normalize_enharmonic(&mut self) {
-        if self.note_name == 'h' {
-            self.note_name = 'a';
+         Pitch {
+            base_midi: self.base_midi + (y * 2),
+            adjustment: self.adjustment + x
         }
     }
 
-    fn note_name_with_offset(note_name: char, offset: i32) -> char {
-        let char_as_digit = note_name as i32;
+    fn file_to_midi(file: char) -> i32 {
+        match file {
+            'a' => 57,
+            'b' => 59,
+            'c' => 60,
+            'd' => 62,
+            'e' => 64,
+            'f' => 65,
+            'g' => 67,
+            'h' => 69,
+            _ => panic!("unexpected file {}", file)
+        }
+    }
+
+    fn as_midi(&self) -> i32 {
+        self.base_midi + self.adjustment
+    }
+
+    fn base_midi_with_offset(base_midi: char, offset: i32) -> char {
+        let char_as_digit = base_midi as i32;
         let char_with_offset = char_as_digit + offset;
         let new_name = if char_with_offset > 0 {char_with_offset as u8 as char} else {panic!("error converting number to char")};
 
@@ -85,20 +89,20 @@ mod tests {
     #[test]
     fn test_new_pitch_with_cell() {
         let pitch = Pitch::new_with_cell(&Cell::new("a1"));
-        assert_eq!(pitch.note_name, 'a');
-        assert_eq!(pitch.half_step_adj, 0);
+        assert_eq!(pitch.base_midi, 57);
+        assert_eq!(pitch.adjustment, 0);
     }
 
     #[test]
     fn test_new_pitch_with_cell_diff() {
         let pitch = Pitch::new('a');
         let new_pitch = pitch.new_with_cell_diff((0, 1));
-        assert_eq!(pitch.note_name, 'b');
-        assert_eq!(pitch.half_step_adj, 0);
+        assert_eq!(new_pitch.base_midi, 59);
+        assert_eq!(new_pitch.adjustment, 0);
 
         let new_pitch = pitch.new_with_cell_diff((1, 0));
-        assert_eq!(pitch.note_name, 'a');
-        assert_eq!(pitch.half_step_adj, 1);
+        assert_eq!(new_pitch.base_midi, 57);
+        assert_eq!(new_pitch.adjustment, 1);
     }
 
     #[test]
