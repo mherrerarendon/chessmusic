@@ -109,8 +109,7 @@ impl Move {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::super::pgn;
-
+    
     #[test]
     fn test_parse_simple_pawn_move() {
         let the_move = Move::parse("a4");

@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-use std::{error::Error};
 use super::types::{Role, PieceName};
 use super::cell::Cell;
 use super::piece::{Piece, Bishop, King, Knight, Pawn, Queen, Rook};
@@ -10,6 +8,7 @@ pub struct Board {
 }
 
 impl Board {
+    #[allow(dead_code)]
     pub fn dump(&self) {
         for row in 1..=8 {
             let chess_row = 9-row;
@@ -58,6 +57,7 @@ impl Board {
         }
     }
 
+    #[cfg(test)]
     pub fn new_bishop_test() -> Board {
         Board {
             pieces: vec![
@@ -248,7 +248,7 @@ mod tests {
         let cell = Cell::new("a1");
         board.remove_piece_at_cell(&cell);
         match board.get_piece_at_cell(&cell) {
-            Some(piece) => panic!("Did not expect to find piece"),
+            Some(_piece) => panic!("Did not expect to find piece"),
             None => assert!(true)
         }
     }

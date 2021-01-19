@@ -17,17 +17,11 @@ impl fmt::Debug for Cell {
 }
 
 impl Cell {
+    #[allow(dead_code)]
     pub fn new(cell_name: &str) -> Cell {
         Cell {
             file: cell_name.chars().nth(0).unwrap(),
             row: cell_name.chars().nth(1).unwrap().to_digit(10).unwrap() as i32
-        }
-    }
-
-    pub fn new_with_name(cell_name: &str) -> Cell {
-        Cell {
-            file: cell_name.chars().nth(0).unwrap(),
-            row: cell_name.chars().nth(0).unwrap().to_digit(10).unwrap() as i32
         }
     }
 

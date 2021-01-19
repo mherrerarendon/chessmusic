@@ -1,11 +1,12 @@
-use std::collections::HashMap;
-use super::types::{Role, MoveType, PieceName};
+use super::types::{MoveType, PieceName};
 use super::chess_move::Move;
 use super::cell::Cell;
 use super::board::Board;
-use super::piece::Piece;
 
 use std::error::Error;
+
+#[cfg(test)]
+use super::types::{Role};
 
 pub struct Game {
     pub board: Board
@@ -77,6 +78,7 @@ impl Game {
              
     }
 
+    #[allow(dead_code)]
     fn add_moves(&mut self, moves: &Vec<(Move, Move)>) {
         for (white_move, black_move) in moves {
             self.add_move(white_move, black_move)
@@ -90,7 +92,7 @@ impl Game {
             Some(piece) => piece_history.push(piece.get_curr_cell().clone()),
             None => ()
         }
-        for (move_num, (white_move, black_move)) in game_moves.iter().enumerate() {
+        for (white_move, black_move) in game_moves.iter() {
             game.add_move(&white_move, &black_move);
             match game.board.get_piece_with_name(name, white) {
                 Some(piece) => piece_history.push(piece.get_curr_cell().clone()),

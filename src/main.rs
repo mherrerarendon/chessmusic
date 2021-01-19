@@ -3,7 +3,7 @@ mod pgn;
 mod chess;
 mod music;
 
-use std::{error::Error, vec};
+use std::{error::Error};
 
 use music::{MidiPlayer, Pitch};
 
