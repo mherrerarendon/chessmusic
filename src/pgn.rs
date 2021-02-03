@@ -1,6 +1,6 @@
 use std::{error::Error};
 
-pub fn parse_moves(game: &String) -> Result<Vec<(&str, &str)>, Box<dyn Error>> {
+pub fn parse_moves(game: &str) -> Result<Vec<(&str, &str)>, Box<dyn Error>> {
     let lines = game.lines();
 
     // Assumed format for moves_line 1. d4 Nf6 2. Bf4 Nc6 3. e3 d5 etc...

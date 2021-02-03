@@ -3,6 +3,10 @@ use std::io::{stdin, stdout, Write};
 use std::thread::sleep;
 use std::time::Duration;
 
+const NOTE_ON_MSG: u8 = 0x90;
+const NOTE_OFF_MSG: u8 = 0x80;
+const VELOCITY: u8 = 0x64;
+
 pub struct MidiPlayer {
     conn_out: MidiOutputConnection
 }
@@ -16,15 +20,29 @@ impl MidiPlayer {
 
     pub fn play_note(&mut self, note: u8) {
         let duration = 4;
-        const NOTE_ON_MSG: u8 = 0x90;
-        const NOTE_OFF_MSG: u8 = 0x80;
-        const VELOCITY: u8 = 0x64;
+        
         match self.conn_out.send(&[NOTE_ON_MSG, note, VELOCITY]) {
             Ok(()) => (),
             Err(the_error) => println!("{}", the_error.to_string())
         }
         sleep(Duration::from_millis(duration * 150));
         self.conn_out.send(&[NOTE_OFF_MSG, note, VELOCITY]).unwrap();
+    }
+
+    pub fn play_notes(&mut self, notes: &Vec<u8>) {
+        let duration = 4;
+        for note in notes {
+            match self.conn_out.send(&[NOTE_ON_MSG, *note, VELOCITY]) {
+                Ok(()) => (),
+                Err(the_error) => println!("{}", the_error.to_string())
+            }
+        }
+        
+        sleep(Duration::from_millis(duration * 150));
+
+        for note in notes {
+            self.conn_out.send(&[NOTE_OFF_MSG, *note, VELOCITY]).unwrap();
+        }
     }
 
     fn get_conn_out() -> MidiOutputConnection {

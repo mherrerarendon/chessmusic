@@ -50,8 +50,8 @@ impl Pitch {
         }
     }
 
-    pub fn as_midi(&self) -> i32 {
-        self.base_midi + self.adjustment
+    pub fn as_midi(&self) -> u8 {
+        (self.base_midi + self.adjustment) as u8
     }
 
     pub fn get_pitches_from_cell_history(cell_history: &Vec<Cell>) -> Vec<Pitch> {
