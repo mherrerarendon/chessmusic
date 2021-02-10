@@ -113,33 +113,15 @@ impl Board {
     }
 
     pub fn get_piece_at_cell(&self, cell: &Cell) -> Option<&Box<dyn Piece>> {
-        for piece in self.pieces.iter() {
-            if piece.get_curr_cell() == cell {
-                return Some(piece);
-            }
-        }
-
-        return None;
+        self.pieces.iter().find(|piece| piece.get_curr_cell() == cell)
     }
 
     pub fn get_piece_with_name(&self, name: PieceName, white: bool) -> Option<&Box<dyn Piece>> {
-        for piece in self.pieces.iter() {
-            if piece.get_name() == name && piece.is_white() == white {
-                return Some(piece);
-            }
-        }
-
-        return None;
+        self.pieces.iter().find(|piece| piece.get_name() == name && piece.is_white() == white)
     }
 
     fn get_mut_piece_with_name(&mut self, name: PieceName, white: bool) -> Option<&mut Box<dyn Piece>> {
-        for piece in self.pieces.iter_mut() {
-            if piece.get_name() == name && piece.is_white() == white {
-                return Some(piece);
-            }
-        }
-
-        return None;
+        self.pieces.iter_mut().find(|piece| piece.get_name() == name && piece.is_white() == white)
     }
 
     pub fn get_pieces_with_role(&self, role: Role, white: bool) -> Vec<&Box<dyn Piece>> {
