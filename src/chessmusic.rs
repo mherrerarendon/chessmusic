@@ -25,8 +25,6 @@ pub fn play_game(game_str: &str) {
     let moves = chess::chess_move::Move::parse_moves(&str_moves);
 
     let (tx, rx): (mpsc::Sender<Vec<Pitch>>, mpsc::Receiver<Vec<Pitch>>) = mpsc::channel();
-    let tx1 = mpsc::Sender::clone(&tx);
-
     crossbeam::scope(|s| {
         let moves = &moves;
         
@@ -34,7 +32,6 @@ pub fn play_game(game_str: &str) {
             let tx1 = mpsc::Sender::clone(&tx);
             s.spawn(move |_| {
                 let pitches = get_pitches_for_piece(piece_name, white, &moves);
-                // let val = String::from("hi");
                 tx1.send(pitches).unwrap();
             });
         }
@@ -42,8 +39,6 @@ pub fn play_game(game_str: &str) {
 
     let mut pitches_list = Vec::with_capacity(PIECES.len());
     for _ in 0..PIECES.len() {
-        // The `recv` method picks a message from the channel
-        // `recv` will block the current thread if there are no messages available
         match rx.recv() {
             Ok(pitches) => pitches_list.push(pitches),
             Err(the_error) => {
