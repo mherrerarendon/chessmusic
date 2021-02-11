@@ -7,6 +7,7 @@ extern crate midir;
 use std::{vec};
 
 
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Pitch {
     base_midi: i32,
     adjustment: i32
@@ -89,5 +90,14 @@ mod tests {
         let new_pitch = pitch.new_with_cell_diff((1, 0));
         assert_eq!(new_pitch.base_midi, 57);
         assert_eq!(new_pitch.adjustment, 1);
+    }
+
+    #[test]
+    fn test_get_pitches_from_cell_history() {
+        let cell_history = vec![Cell::new("a2"), Cell::new("a3"), Cell::new("a4")];
+        let pitches = Pitch::get_pitches_from_cell_history(&cell_history);
+        assert_eq!(pitches[0], Pitch {base_midi: 57, adjustment: 1});
+        assert_eq!(pitches[1], Pitch {base_midi: 59, adjustment: 1});
+        assert_eq!(pitches[2], Pitch {base_midi: 61, adjustment: 1});
     }
 }

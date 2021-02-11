@@ -17,6 +17,50 @@ fn get_pitches_for_piece(piece_name: chess::PieceName, white: bool, moves: &Vec<
     Pitch::get_pitches_from_cell_history(&piece_history)
 }
 
+fn generate_pitches_by_pieces(pieces: &[(chess::PieceName, bool)], tx: mpsc::Sender<Vec<Pitch>>, moves: &Vec<(Move, Move)>) {
+    crossbeam::scope(|s| {
+        for (piece_name, white) in pieces.iter() {
+            let tx1 = mpsc::Sender::clone(&tx);
+            s.spawn(move |_| {
+                let pitches = get_pitches_for_piece(*piece_name, *white, &moves);
+                tx1.send(pitches).unwrap();
+            });
+        }
+    }).unwrap();
+}
+
+fn receive_pitches_by_piece(pieces: &[(chess::PieceName, bool)], rx: mpsc::Receiver<Vec<Pitch>>) -> Vec<Vec<Pitch>> {
+    let mut pitches_by_piece: Vec<Vec<Pitch>> = Vec::with_capacity(pieces.len());
+
+    for _ in 0..pieces.len() {
+        match rx.recv() {
+            Ok(pitches) => pitches_by_piece.push(pitches),
+            Err(the_error) => {
+                println!("{}", the_error.to_string())
+            }
+        }
+    }
+
+    pitches_by_piece
+}
+
+fn chords_from_pitches_by_piece(pitches_by_piece: &Vec<Vec<Pitch>>) -> Vec<Vec<Pitch>> {
+    let mut chords: Vec<Vec<Pitch>> = Vec::new();
+    let longest_length = pitches_by_piece.iter().max_by_key(|pitches| pitches.len()).unwrap().len();
+    for n in 0..longest_length {
+        let mut chord: Vec<Pitch> = Vec::new();
+        for pitches in pitches_by_piece.iter() {
+            match pitches.get(n) {
+                Some(pitch) => chord.push(*pitch),
+                None => () // Nothing to add
+            }
+        }
+
+        chords.push(chord);
+    }
+    chords
+}
+
 pub fn play_game(game_str: &str) {
     let str_moves = match pgn::parse_moves(game_str) {
         Ok(str_moves) => str_moves,
@@ -25,27 +69,8 @@ pub fn play_game(game_str: &str) {
     let moves = chess::chess_move::Move::parse_moves(&str_moves);
 
     let (tx, rx): (mpsc::Sender<Vec<Pitch>>, mpsc::Receiver<Vec<Pitch>>) = mpsc::channel();
-    crossbeam::scope(|s| {
-        let moves = &moves;
-        
-        for (piece_name, white) in PIECES.iter().cloned() {
-            let tx1 = mpsc::Sender::clone(&tx);
-            s.spawn(move |_| {
-                let pitches = get_pitches_for_piece(piece_name, white, &moves);
-                tx1.send(pitches).unwrap();
-            });
-        }
-    }).unwrap();
-
-    let mut pitches_list = Vec::with_capacity(PIECES.len());
-    for _ in 0..PIECES.len() {
-        match rx.recv() {
-            Ok(pitches) => pitches_list.push(pitches),
-            Err(the_error) => {
-                println!("{}", the_error.to_string())
-            }
-        }
-    }
+    generate_pitches_by_pieces(PIECES, tx, &moves);
+    let pitches_list = receive_pitches_by_piece(PIECES, rx);
 
     let mut midi_player = MidiPlayer::new();
     for piece in pitches_list.iter() {
@@ -53,5 +78,19 @@ pub fn play_game(game_str: &str) {
             midi_player.play_note(pitch.as_midi());
         }
     }
-    
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_chords_from_pitches_by_piece() {
+        let cell_history1 = vec![chess::Cell::new("a2"), chess::Cell::new("a3"), chess::Cell::new("a4")];
+        let pitches1 = Pitch::get_pitches_from_cell_history(&cell_history1);
+        let cell_history2 = vec![chess::Cell::new("c2"), chess::Cell::new("c3"), chess::Cell::new("d4")];
+        let pitches2 = Pitch::get_pitches_from_cell_history(&cell_history2);
+        let pitches_by_piece = vec![pitches1, pitches2];
+        let chords = chords_from_pitches_by_piece(&pitches_by_piece);
+    }
 }
