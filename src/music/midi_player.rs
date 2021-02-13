@@ -18,6 +18,7 @@ impl MidiPlayer {
         }
     }
 
+    #[allow(dead_code)]
     pub fn play_note(&mut self, note: u8) {
         let duration = 4;
         

@@ -1,5 +1,3 @@
-use chess::{PieceName, board::Board, chess_move::Move, piece::Piece};
-
 use super::pgn;
 use super::chess;
 use super::music::{MidiPlayer, Pitch};
@@ -9,15 +7,47 @@ use std::sync::mpsc;
 extern crate crossbeam;
 
 static PIECES: &'static [(chess::PieceName, bool)] = &[
-    (chess::PieceName::Qknight, true)
-    ];
+    // (chess::PieceName::Apawn, true),
+    // (chess::PieceName::Bpawn, true),
+    // (chess::PieceName::Cpawn, true),
+    // (chess::PieceName::Dpawn, true),
+    (chess::PieceName::Epawn, true),
+    // (chess::PieceName::Fpawn, true),
+    // (chess::PieceName::Gpawn, true),
+    // (chess::PieceName::Hpawn, true),
+    // (chess::PieceName::Qrook, true),
+    (chess::PieceName::Qknight, true),
+    // (chess::PieceName::Qbishop, true),
+    (chess::PieceName::Queen, true),
+    // (chess::PieceName::King, true),
+    // (chess::PieceName::Kbishop, true),
+    // (chess::PieceName::Kknight, true),
 
-fn get_pitches_for_piece(piece_name: chess::PieceName, white: bool, moves: &Vec<(Move, Move)>) -> Vec<Pitch> {
+    // (chess::PieceName::Apawn, false),
+    // (chess::PieceName::Bpawn, false),
+    // (chess::PieceName::Cpawn, false),
+    // (chess::PieceName::Dpawn, false),
+    (chess::PieceName::Epawn, false),
+    // (chess::PieceName::Fpawn, false),
+    // (chess::PieceName::Gpawn, false),
+    // (chess::PieceName::Hpawn, false),
+    // (chess::PieceName::Krook, true),
+    // (chess::PieceName::Qrook, false),
+    // (chess::PieceName::Qknight, false),
+    // (chess::PieceName::Qbishop, false),
+    (chess::PieceName::Queen, false),
+    // (chess::PieceName::King, false),
+    // (chess::PieceName::Kbishop, false),
+    (chess::PieceName::Kknight, false),
+    // (chess::PieceName::Krook, false),
+];
+
+fn get_pitches_for_piece(piece_name: chess::PieceName, white: bool, moves: &Vec<(chess::Move, chess::Move)>) -> Vec<Pitch> {
     let piece_history = chess::Game::get_piece_history(piece_name, white, &moves);
     Pitch::get_pitches_from_cell_history(&piece_history)
 }
 
-fn generate_pitches_by_pieces(pieces: &[(chess::PieceName, bool)], tx: mpsc::Sender<Vec<Pitch>>, moves: &Vec<(Move, Move)>) {
+fn generate_pitches_by_pieces(pieces: &[(chess::PieceName, bool)], tx: mpsc::Sender<Vec<Pitch>>, moves: &Vec<(chess::Move, chess::Move)>) {
     crossbeam::scope(|s| {
         for (piece_name, white) in pieces.iter() {
             let tx1 = mpsc::Sender::clone(&tx);
@@ -66,7 +96,7 @@ pub fn play_game(game_str: &str) {
         Ok(str_moves) => str_moves,
         Err(_the_error) => panic!("failed to parse moves")
     };
-    let moves = chess::chess_move::Move::parse_moves(&str_moves);
+    let moves = chess::Move::parse_moves(&str_moves);
 
     let (tx, rx): (mpsc::Sender<Vec<Pitch>>, mpsc::Receiver<Vec<Pitch>>) = mpsc::channel();
     generate_pitches_by_pieces(PIECES, tx, &moves);

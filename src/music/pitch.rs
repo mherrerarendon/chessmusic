@@ -38,7 +38,7 @@ impl Pitch {
     }
 
     fn file_to_midi(file: char) -> i32 {
-        match file {
+        let midi_note = match file {
             'a' => 57,
             'b' => 59,
             'c' => 60,
@@ -48,7 +48,8 @@ impl Pitch {
             'g' => 67,
             'h' => 69,
             _ => panic!("unexpected file {}", file)
-        }
+        };
+        midi_note
     }
 
     pub fn as_midi(&self) -> u8 {

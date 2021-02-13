@@ -19,13 +19,13 @@
                     "kind": "bin"
                 }
             },
-            "args": [],
+            "args": ["tzUJbFEX"],
             "cwd": "${workspaceFolder}"
         },
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'chessmusic'",
+            "name": "Debug tests",
             "cargo": {
                 "args": [
                     "test",
@@ -39,7 +39,12 @@
                 }
             },
             "args": [],
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "CARGO_INCREMENTAL": "0",
+                "RUSTFLAGS": "-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort",
+                "RUSTDOCFLAGS": "-Cpanic=abort",
+            },
         }
     ]
 }

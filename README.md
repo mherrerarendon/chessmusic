@@ -17,4 +17,4 @@ Clone this repository and cd into it's root directory.
 Run `cargo build` on a terminal to build, or `cargo test` to run unit tests.
 
 ## How to use
-The plan is to take a Lichess game ID as a command line argument, but for now the game ID is hardcoded. So if you run the executable with no arguments you'll hear a game between my dad and me.
+The program takes a Lichess game ID as a command line argument. Example: `chessmusic tzUJbFEX`

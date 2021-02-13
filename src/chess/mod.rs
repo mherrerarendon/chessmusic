@@ -8,4 +8,5 @@ pub mod piece;
 pub use game::Game as Game;
 pub use types::PieceName as PieceName;
 pub use cell::Cell as Cell;
+pub use chess_move::Move as Move;
 

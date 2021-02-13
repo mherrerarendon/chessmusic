@@ -1,0 +1,22 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cargo",
+			"command": "build",
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"label": "rust: cargo build",
+			"env": {
+                "CARGO_INCREMENTAL": "0",
+                "RUSTFLAGS": "-profile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -panic_abort_tests -Cpanic=abort",
+                "RUSTDOCFLAGS": "-Cpanic=abort",
+            },
+		}
+	]
+}
