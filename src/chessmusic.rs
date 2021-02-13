@@ -70,13 +70,13 @@ pub fn play_game(game_str: &str) {
 
     let (tx, rx): (mpsc::Sender<Vec<Pitch>>, mpsc::Receiver<Vec<Pitch>>) = mpsc::channel();
     generate_pitches_by_pieces(PIECES, tx, &moves);
-    let pitches_list = receive_pitches_by_piece(PIECES, rx);
+    let pitches_by_piece = receive_pitches_by_piece(PIECES, rx);
+    let chords = chords_from_pitches_by_piece(&pitches_by_piece);
 
     let mut midi_player = MidiPlayer::new();
-    for piece in pitches_list.iter() {
-        for pitch in piece.iter() {
-            midi_player.play_note(pitch.as_midi());
-        }
+    for chord in chords.iter() {
+        let notes: Vec<u8> = chord.iter().map(|pitch|pitch.as_midi()).collect();
+        midi_player.play_notes(&notes);
     }
 }
 
@@ -85,12 +85,40 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_chords_from_pitches_by_piece() {
+    fn test_chords_from_pitches_by_piece_with_equal_length() {
         let cell_history1 = vec![chess::Cell::new("a2"), chess::Cell::new("a3"), chess::Cell::new("a4")];
         let pitches1 = Pitch::get_pitches_from_cell_history(&cell_history1);
         let cell_history2 = vec![chess::Cell::new("c2"), chess::Cell::new("c3"), chess::Cell::new("d4")];
         let pitches2 = Pitch::get_pitches_from_cell_history(&cell_history2);
         let pitches_by_piece = vec![pitches1, pitches2];
         let chords = chords_from_pitches_by_piece(&pitches_by_piece);
+
+        assert_eq!(chords.len(), 3);
+        assert_eq!(chords[0].len(), 2);
+        assert_eq!(chords[1].len(), 2);
+        assert_eq!(chords[2].len(), 2);
+
+        assert_eq!(chords[0], vec![Pitch {base_midi: 57, adjustment: 1}, Pitch {base_midi: 60, adjustment: 1}]);
+        assert_eq!(chords[1], vec![Pitch {base_midi: 59, adjustment: 1}, Pitch {base_midi: 62, adjustment: 1}]);
+        assert_eq!(chords[2], vec![Pitch {base_midi: 61, adjustment: 1}, Pitch {base_midi: 64, adjustment: 2}]);
+    }
+
+    #[test]
+    fn test_chords_from_pitches_by_piece_with_different_length() {
+        let cell_history1 = vec![chess::Cell::new("a2"), chess::Cell::new("a3")];
+        let pitches1 = Pitch::get_pitches_from_cell_history(&cell_history1);
+        let cell_history2 = vec![chess::Cell::new("c2"), chess::Cell::new("c2"), chess::Cell::new("c2")];
+        let pitches2 = Pitch::get_pitches_from_cell_history(&cell_history2);
+        let pitches_by_piece = vec![pitches1, pitches2];
+        let chords = chords_from_pitches_by_piece(&pitches_by_piece);
+
+        assert_eq!(chords.len(), 3);
+        assert_eq!(chords[0].len(), 2);
+        assert_eq!(chords[1].len(), 2);
+        assert_eq!(chords[2].len(), 1);
+
+        assert_eq!(chords[0], vec![Pitch {base_midi: 57, adjustment: 1}, Pitch {base_midi: 60, adjustment: 1}]);
+        assert_eq!(chords[1], vec![Pitch {base_midi: 59, adjustment: 1},  Pitch {base_midi: 60, adjustment: 1}]);
+        assert_eq!(chords[2], vec![Pitch {base_midi: 60, adjustment: 1}]);
     }
 }

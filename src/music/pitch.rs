@@ -9,8 +9,8 @@ use std::{vec};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Pitch {
-    base_midi: i32,
-    adjustment: i32
+    pub base_midi: i32,
+    pub adjustment: i32
 }
 
 impl Pitch {
