@@ -67,23 +67,16 @@ impl Move {
         }
         
         let re = regex::Regex::new(r"([RNBQK]?)([a-h]?)([a-h])(\d)").unwrap();
-        let caps = match re.captures(&clean_move_str) {
-            Some(caps) => caps,
-            None => {
-                println!("Failed to capture moves from actual: {} clean: {}", move_str, clean_move_str);
-                panic!("Failed to capture moves from actual: {} clean: {}", move_str, clean_move_str);
-            }
-        };
+        let caps = re.captures(&clean_move_str).expect("Failed to capture moves");
         the_move.role = caps.get(1).map_or(Role::Pawn, |m| role_char_to_role(m.as_str()));
-        match caps.get(2) {
-            Some(m) => {
-                let file_hint_as_str = m.as_str();
-                if file_hint_as_str.len() > 0 {
-                    the_move.file_hint = file_hint_as_str.chars().into_iter().next().unwrap();
-                }
-            },
-            None => ()
+
+        if let Some(m) = caps.get(2) {
+            let file_hint_as_str = m.as_str();
+            if file_hint_as_str.len() > 0 {
+                the_move.file_hint = file_hint_as_str.chars().into_iter().next().unwrap();
+            }
         }
+
         the_move.cell = Cell {
             file: caps.get(3).map_or(' ', |m| m.as_str().chars().next().unwrap()),
             row: caps.get(4).map_or(0, |m| m.as_str().parse::<i32>().unwrap())

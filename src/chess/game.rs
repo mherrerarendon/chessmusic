@@ -88,15 +88,16 @@ impl Game {
     pub fn get_piece_history(name: PieceName, white: bool, game_moves: &Vec<(Move, Move)>) -> Vec<Cell> {
         let mut piece_history: Vec<Cell> = Vec::new();
         let mut game = Game::new();
-        match game.board.get_piece_with_name(name, white) {
-            Some(piece) => piece_history.push(piece.get_curr_cell().clone()),
-            None => ()
+        if let Some(piece) = game.board.get_piece_with_name(name, white) {
+            piece_history.push(piece.get_curr_cell().clone());
         }
+
         for (white_move, black_move) in game_moves.iter() {
             game.add_move(&white_move, &black_move);
-            match game.board.get_piece_with_name(name, white) {
-                Some(piece) => piece_history.push(piece.get_curr_cell().clone()),
-                None => ()
+            if let Some(piece) = game.board.get_piece_with_name(name, white) {
+                piece_history.push(piece.get_curr_cell().clone());
+            } else {
+                break;
             }
         }
 

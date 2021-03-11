@@ -129,26 +129,18 @@ impl Board {
     }
 
     fn remove_piece_at_cell(&mut self, cell: &Cell) {
-        match self.get_piece_at_cell(&cell) {
-            Some(piece) => {
-                let index = self.pieces.iter()
-                    .position(|x| (x.get_name() == piece.get_name() && x.is_white() == piece.is_white())).unwrap();
-                self.pieces.remove(index);
-            },
-            None => () // Cell was empty, nothing to do
+        if let Some(piece) = self.get_piece_at_cell(&cell) {
+            let index = self.pieces.iter()
+                .position(|x| (x.get_name() == piece.get_name() && x.is_white() == piece.is_white())).unwrap();
+            self.pieces.remove(index);
         }
     }
 
     pub fn move_piece(&mut self, name: PieceName, white: bool, cell: &Cell) {
         self.remove_piece_at_cell(cell);
-        match self.get_mut_piece_with_name(name, white) {
-            Some(piece) => {
-                
-                piece.set_new_cell(&cell);
-                piece.set_has_moved();
-            },
-            None => println!("unable to move piece")
-        }
+        let piece = self.get_mut_piece_with_name(name, white).expect("unable to move piece");
+        piece.set_new_cell(&cell);
+        piece.set_has_moved();
     }
 }
 

@@ -80,9 +80,8 @@ fn chords_from_pitches_by_piece(pitches_by_piece: &Vec<Vec<Pitch>>) -> Vec<Vec<P
     for n in 0..longest_length {
         let mut chord: Vec<Pitch> = Vec::new();
         for pitches in pitches_by_piece.iter() {
-            match pitches.get(n) {
-                Some(pitch) => chord.push(*pitch),
-                None => () // Nothing to add
+            if let Some(pitch) =  pitches.get(n) {
+                chord.push(*pitch);
             }
         }
 

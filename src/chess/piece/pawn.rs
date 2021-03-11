@@ -56,24 +56,17 @@ impl Pawn {
         cell
     }
 
-    fn add_cell_if_valid(&self, board: &Board, cell: Option<Cell>, is_take: bool, mut valid_cells: Vec<Cell>) -> Vec<Cell> {
-        match cell {
-            Some(cell) => {
-                match board.get_piece_at_cell(&cell) {
-                    Some(piece) => {
-                        if is_take && piece.is_white() != self.is_white() {
-                            valid_cells.push(cell)
-                        }
-                    },
-                    None => {
-                        if !is_take {
-                            valid_cells.push(cell)
-                        }
-                    }
+    fn add_cell_if_valid(&self, board: &Board, cell_opt: Option<Cell>, is_take: bool, mut valid_cells: Vec<Cell>) -> Vec<Cell> {
+        if let Some(cell) = cell_opt {
+            if let Some(piece) = board.get_piece_at_cell(&cell) {
+                if is_take && piece.is_white() != self.is_white() {
+                    valid_cells.push(cell)
                 }
-            },
-            None => ()
-    
+            } else {
+                if !is_take {
+                    valid_cells.push(cell)
+                }
+            }
         }
     
         valid_cells

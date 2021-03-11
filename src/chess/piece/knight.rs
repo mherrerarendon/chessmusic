@@ -51,21 +51,14 @@ impl Knight {
     }
 
     fn attempt_to_add_as_valid_cell(&self, cell_opt: Option<Cell>, board: &Board, valid_cells: &mut Vec<Cell>) {
-        match cell_opt {
-            Some(cell) => {
-                match board.get_piece_at_cell(&cell) {
-                    Some(piece) => {
-                        if piece.is_white() != self.is_white() {
-                            valid_cells.push(cell.clone());
-                        }
-                    },
-                    None => {
-                        valid_cells.push(cell.clone());
-                    }
+        if let Some(cell) = cell_opt {
+            if let Some(piece) = board.get_piece_at_cell(&cell) {
+                if piece.is_white() != self.is_white() {
+                    valid_cells.push(cell.clone());
                 }
-            },
-            None => ()
-    
+            } else {
+                valid_cells.push(cell.clone());
+            }
         }
     }
 
