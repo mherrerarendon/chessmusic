@@ -1,28 +1,18 @@
 use super::super::types::{PieceName, Role};
 use super::super::cell::Cell;
-use super::Piece;
+use super::{Piece, PieceState, PieceStateTrait};
 use super::super::board::Board;
 use super::super::chess_move::Move;
 
 
 pub struct Knight {
-    pub name: PieceName,
-    pub white: bool, 
-    pub role: Role,
-    pub cell: Cell,
-    pub first_move: bool
+    pub state: PieceState
 }
 
 impl Piece for Knight {
-    fn get_name(&self) -> PieceName {self.name}
-    fn is_white(&self) -> bool {self.white}
-    fn get_role(&self) -> Role {self.role}
-    fn get_char_representation(&self) -> char {if self.white {'N'} else {'n'}}
-    fn get_curr_cell(&self) -> &Cell {&self.cell}
-    fn set_new_cell(&mut self, cell: &Cell) {self.cell = cell.clone()}
-    fn has_moved(&self) -> bool {!self.first_move}
-    fn set_has_moved(&mut self) {self.first_move = false}
-
+    fn get_state(&self) -> Box<&dyn PieceStateTrait> {Box::new(&self.state)}
+    fn get_mut_state(&mut self) -> Box<&mut dyn PieceStateTrait> {Box::new(&mut self.state)}
+    fn get_char_representation(&self) -> char {if self.is_white() {'N'} else {'n'}}
     fn is_valid_move(&self, board: &Board, the_move: &Move) -> bool {
         let valid_cells = self.get_valid_cells(board);
         return valid_cells.contains(&the_move.cell);
@@ -32,11 +22,13 @@ impl Piece for Knight {
 impl Knight {
     pub fn new(white: bool, name: PieceName) -> Knight {
         Knight {
-            name: name, 
-            white: white, 
-            role: Role::Knight, 
-            first_move: true, 
-            cell: Knight::init_cell(white, name)
+            state: PieceState {
+                name: name, 
+                white: white, 
+                role: Role::Knight, 
+                first_move: true, 
+                cell: Knight::init_cell(white, name)
+            }
         }
     }
 
@@ -65,14 +57,14 @@ impl Knight {
     fn get_valid_cells(&self, board: &Board) -> Vec<Cell> {
         let mut valid_cells: Vec<Cell> = Vec::new();
 
-        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(&self.cell, 1, 2), &board, &mut valid_cells);
-        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(&self.cell, 2, 1), &board, &mut valid_cells);
-        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(&self.cell, 2, -1), &board, &mut valid_cells);
-        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(&self.cell, 1, -2), &board, &mut valid_cells);
-        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(&self.cell, -1, -2), &board, &mut valid_cells);
-        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(&self.cell, -2, -1), &board, &mut valid_cells);
-        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(&self.cell, -2, 1), &board, &mut valid_cells);
-        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(&self.cell, -1, 2), &board, &mut valid_cells);
+        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), 1, 2), &board, &mut valid_cells);
+        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), 2, 1), &board, &mut valid_cells);
+        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), 2, -1), &board, &mut valid_cells);
+        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), 1, -2), &board, &mut valid_cells);
+        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), -1, -2), &board, &mut valid_cells);
+        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), -2, -1), &board, &mut valid_cells);
+        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), -2, 1), &board, &mut valid_cells);
+        self.attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), -1, 2), &board, &mut valid_cells);
 
         valid_cells
     }

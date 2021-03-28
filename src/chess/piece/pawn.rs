@@ -1,27 +1,17 @@
 use super::super::types::{PieceName, Role};
 use super::super::cell::Cell;
-use super::Piece;
+use super::{Piece, PieceState, PieceStateTrait};
 use super::super::board::Board;
 use super::super::chess_move::Move;
 
 pub struct Pawn {
-    pub name: PieceName,
-    pub white: bool, 
-    pub role: Role,
-    pub cell: Cell,
-    pub first_move: bool
+    pub state: PieceState
 }
 
 impl Piece for Pawn {
-    fn get_name(&self) -> PieceName {self.name}
-    fn is_white(&self) -> bool {self.white}
-    fn get_role(&self) -> Role {self.role}
-    fn get_char_representation(&self) -> char {if self.white {'P'} else {'p'}}
-    fn get_curr_cell(&self) -> &Cell {&self.cell}
-    fn set_new_cell(&mut self, cell: &Cell) {self.cell = cell.clone()}
-    fn has_moved(&self) -> bool {!self.first_move}
-    fn set_has_moved(&mut self) {self.first_move = false}
-
+    fn get_state(&self) -> Box<&dyn PieceStateTrait> {Box::new(&self.state)}
+    fn get_mut_state(&mut self) -> Box<&mut dyn PieceStateTrait> {Box::new(&mut self.state)}
+    fn get_char_representation(&self) -> char {if self.is_white() {'P'} else {'p'}}
     fn is_valid_move(&self, board: &Board, the_move: &Move) -> bool {
         let valid_cells = self.get_valid_cells(board);
         return valid_cells.contains(&the_move.cell);
@@ -31,11 +21,13 @@ impl Piece for Pawn {
 impl Pawn {
     pub fn new(white: bool, name: PieceName) -> Pawn {
         Pawn {
-            name: name, 
-            white: white, 
-            role: Role::Pawn, 
-            first_move: true, 
-            cell: Pawn::init_cell(white, name)
+            state: PieceState {
+                name: name, 
+                white: white, 
+                role: Role::Pawn, 
+                first_move: true, 
+                cell: Pawn::init_cell(white, name)
+            }
         }
     }
 
@@ -74,21 +66,20 @@ impl Pawn {
 
     fn get_valid_cells(&self, board: &Board) -> Vec<Cell> {
         let mut valid_cells: Vec<Cell> = Vec::new();
-        let direction = if self.white {1} else {-1};
-        if self.first_move {
-            let double_forward_cell_option = Cell::new_from_cell(&self.cell, 0, 2 * direction);
+        let direction = if self.is_white() {1} else {-1};
+        if !self.has_moved() {
+            let double_forward_cell_option = Cell::new_from_cell(self.get_curr_cell(), 0, 2 * direction);
             valid_cells = self.add_cell_if_valid(board, double_forward_cell_option, false, valid_cells);
         }
-        else {
-            let take_left_cell_option = Cell::new_from_cell(&self.cell, -1, 1 * direction);
-            valid_cells = self.add_cell_if_valid(board, take_left_cell_option, true, valid_cells);
 
-            let take_right_cell_option = Cell::new_from_cell(&self.cell, -1, 1 * direction);
-            valid_cells = self.add_cell_if_valid(board, take_right_cell_option, true, valid_cells);
-        }
+        let take_left_cell_option = Cell::new_from_cell(self.get_curr_cell(), -1, 1 * direction);
+        valid_cells = self.add_cell_if_valid(board, take_left_cell_option, true, valid_cells);
 
-        let double_forward_cell_option = Cell::new_from_cell(&self.cell, 0, 1 * direction);
-        valid_cells = self.add_cell_if_valid(board, double_forward_cell_option, false, valid_cells);
+        let take_right_cell_option = Cell::new_from_cell(self.get_curr_cell(), 1, 1 * direction);
+        valid_cells = self.add_cell_if_valid(board, take_right_cell_option, true, valid_cells);
+
+        let single_forward_cell_option = Cell::new_from_cell(self.get_curr_cell(), 0, 1 * direction);
+        valid_cells = self.add_cell_if_valid(board, single_forward_cell_option, false, valid_cells);
 
         valid_cells
     }

@@ -140,7 +140,6 @@ impl Board {
         self.remove_piece_at_cell(cell);
         let piece = self.get_mut_piece_with_name(name, white).expect("unable to move piece");
         piece.set_new_cell(&cell);
-        piece.set_has_moved();
     }
 }
 

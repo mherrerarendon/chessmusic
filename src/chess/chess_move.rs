@@ -93,9 +93,8 @@ impl Move {
         }
     }
 
-    pub fn parse_moves(moves: &Vec<(&str, &str)>) -> Vec<(Move, Move)> {
-        let new_moves: Vec<(Move, Move)> = moves.iter().map(|x| (Move::parse(x.0), Move::parse(x.1))).collect();
-        new_moves
+    pub fn parse_moves(moves: &[&str]) -> Vec<Move> {
+        moves.iter().map(|x| Move::parse(x)).collect()
     }
 }
 

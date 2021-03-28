@@ -1,6 +1,4 @@
-use std::{error::Error};
-
-pub fn parse_moves(game: &str) -> Result<Vec<(&str, &str)>, Box<dyn Error>> {
+pub fn parse_moves(game: &str) -> Vec<&str> {
     let lines = game.lines();
 
     // Assumed format for moves_line 1. d4 Nf6 2. Bf4 Nc6 3. e3 d5 etc...
@@ -12,20 +10,31 @@ pub fn parse_moves(game: &str) -> Result<Vec<(&str, &str)>, Box<dyn Error>> {
     // The first item is always an empty string, because the game line starts with the split regex
     split.remove(0);
 
-    let split2 = split.iter().map(|the_move| parse_move(the_move)).collect();
+    let move_pairs = split.iter()
+        .map(|the_move| parse_move_pair(the_move))
+        .collect::<Vec<(&str, Option<&str>)>>();
 
-    Ok(split2)
+    let mut moves = Vec::new();
+    for (white_move, black_move_opt) in move_pairs.iter() {
+        moves.push(*white_move);
+        if let Some(black_move) = black_move_opt {
+            moves.push(*black_move);
+        } else {
+            break;
+        }
+    }
+    assert!(moves.len() == move_pairs.len() * 2 || moves.len() == move_pairs.len() * 2 - 1);
+    moves
 }
 
-fn parse_move(the_move: &str) -> (&str, &str) {
-    let moves = the_move.split(" ").collect::<Vec<&str>>();
+fn parse_move_pair(move_str: &str) -> (&str, Option<&str>) {
+    let moves = move_str.split(" ").collect::<Vec<&str>>();
     let white_move: &str = moves[0].trim();
-    let black_move: &str = match moves.len() {
-        2 => "",
-        3 => moves[1].trim(),
+    let black_move: Option<&str> = match moves.len() {
+        2 => None,
+        3 => Some(moves[1].trim()),
         _ => panic!("Did not expect to get here")
     };
-    // let black_move: &str = if moves.len() > 1 {moves[1].trim()} else {""};
     (white_move, black_move)
 }
 
@@ -34,36 +43,32 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_parse_moves() -> Result<(), Box<dyn Error>> {
-        let moves_str = String::from("1. d4 Nf6 2. Bf4 Nc6 3. e3 1-0");
-        let moves = parse_moves(&moves_str)?;
-        assert_eq!(moves.len(), 3);
+    fn test_parse_moves() {
+        let moves_str = "1. d4 Nf6 2. Bf4 Nc6 3. e3 1-0";
+        let moves = parse_moves(moves_str);
+        assert_eq!(moves.len(), 5);
 
-        assert_eq!(moves[0].0, "d4");
-        assert_eq!(moves[1].0, "Bf4");
-        assert_eq!(moves[2].0, "e3");
-
-        assert_eq!(moves[0].1, "Nf6");
-        assert_eq!(moves[1].1, "Nc6");
-        assert_eq!(moves[2].1, "");
-
-        Ok(())
+        assert_eq!(moves[0], "d4");
+        assert_eq!(moves[1], "Nf6");
+        assert_eq!(moves[2], "Bf4");
+        assert_eq!(moves[3], "Nc6");
+        assert_eq!(moves[4], "e3");
     }
 
     #[test]
     fn test_parse_move_with_both_sides() {
-        let (white_move, black_move) = parse_move("Bg2 Qxg2# 0-1");
+        let (white_move, black_move) = parse_move_pair("Bg2 Qxg2# 0-1");
 
         assert_eq!(white_move, "Bg2");
-        assert_eq!(black_move, "Qxg2#");
+        assert_eq!(black_move.unwrap(), "Qxg2#");
     }
 
     #[test]
     fn test_parse_move_with_one_side() {
-        let (white_move, black_move) = parse_move("Qxc4 1-0");
+        let (white_move, black_move) = parse_move_pair("Qxc4 1-0");
 
         assert_eq!(white_move, "Qxc4");
-        assert_eq!(black_move, "");
+        assert!(black_move.is_none());
     }
 
     #[test]
@@ -90,11 +95,10 @@ mod tests {
 
 ");
         
-        let str_moves = parse_moves(&game_str).unwrap();
-        assert_eq!(str_moves.len(), 28);
-        let (last_white_move, last_black_move) = str_moves[27];
-        assert_eq!(last_white_move, "Bg2");
-        assert_eq!(last_black_move, "Qxg2#");
+        let str_moves = parse_moves(&game_str);
+        assert_eq!(str_moves.len(), 56);
+        let last_move = str_moves[55];
+        assert_eq!(last_move, "Qxg2#");
     }
 
     #[test]
@@ -121,10 +125,9 @@ mod tests {
 1. e4 d5 2. Nc3 d4 3. Nd5 f5 4. f3 Nf6 5. d3 Nxd5 6. exd5 Qxd5 7. f4 e5 8. Be2 e4 9. dxe4 Qxe4 10. Nf3 c5 11. c3 Nc6 12. O-O Bd6 13. Bd3 Qd5 14. Re1+ Be6 15. c4 Qxc4 16. Bxc4 O-O-O 17. Rxe6 Na5 18. Qd3 Nxc4 19. Qxc4 1-0"
         );
 
-        let str_moves = parse_moves(&game_str).unwrap();
-        assert_eq!(str_moves.len(), 19);
-        let (last_white_move, last_black_move) = str_moves[18];
-        assert_eq!(last_white_move, "Qxc4");
-        assert_eq!(last_black_move, "");
+        let str_moves = parse_moves(&game_str);
+        assert_eq!(str_moves.len(), 37);
+        let last_move = str_moves[36];
+        assert_eq!(last_move, "Qxc4");
     }
 }

@@ -1,28 +1,18 @@
 use super::super::types::{PieceName, Role};
 use super::super::cell::Cell;
-use super::Piece;
+use super::{Piece, PieceState, PieceStateTrait};
 use super::super::board::Board;
 use super::super::chess_move::Move;
 
 
 pub struct Queen {
-    pub name: PieceName,
-    pub white: bool, 
-    pub role: Role,
-    pub cell: Cell,
-    pub first_move: bool
+    pub state: PieceState
 }
 
 impl Piece for Queen {
-    fn get_name(&self) -> PieceName {self.name}
-    fn is_white(&self) -> bool {self.white}
-    fn get_role(&self) -> Role {self.role}
-    fn get_char_representation(&self) -> char {if self.white {'Q'} else {'q'}}
-    fn get_curr_cell(&self) -> &Cell {&self.cell}
-    fn set_new_cell(&mut self, cell: &Cell) {self.cell = cell.clone()}
-    fn has_moved(&self) -> bool {!self.first_move}
-    fn set_has_moved(&mut self) {self.first_move = false}
-
+    fn get_state(&self) -> Box<&dyn PieceStateTrait> {Box::new(&self.state)}
+    fn get_mut_state(&mut self) -> Box<&mut dyn PieceStateTrait> {Box::new(&mut self.state)}
+    fn get_char_representation(&self) -> char {if self.is_white() {'Q'} else {'q'}}
     fn is_valid_move(&self, board: &Board, the_move: &Move) -> bool {
         let valid_cells = self.get_valid_cells(board);
         return valid_cells.contains(&the_move.cell);
@@ -32,11 +22,13 @@ impl Piece for Queen {
 impl Queen {
     pub fn new(white: bool) -> Queen {
         Queen {
-            name: PieceName::Queen, 
-            white: white, 
-            role: Role::Queen, 
-            first_move: true, 
-            cell: Queen::init_cell(white)
+            state: PieceState {
+                name: PieceName::Queen, 
+                white: white, 
+                role: Role::Queen, 
+                first_move: true, 
+                cell: Queen::init_cell(white)
+            }
         }
     }
 
@@ -68,59 +60,59 @@ impl Queen {
         let mut valid_cells: Vec<Cell> = Vec::new();
         let mut stop = false;
 
-        // bishop moves
+        // bishop-like moves
         for offset in 1..=7 {
             if stop {break;}
-            let cell_opt = Cell::new_from_cell(&self.cell, offset, offset);
+            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), offset, offset);
             stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
         } 
         stop = false;
         for offset in 1..=7 {
             let reversed_offset = offset * -1;
             if stop {break;}
-            let cell_opt = Cell::new_from_cell(&self.cell, offset, reversed_offset);
+            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), offset, reversed_offset);
             stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
         } 
         stop = false;
         for offset in 1..=7 {
             let reversed_offset = offset * -1;
             if stop {break;}
-            let cell_opt = Cell::new_from_cell(&self.cell, reversed_offset, reversed_offset);
+            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), reversed_offset, reversed_offset);
             stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
         } 
         stop = false;
         for offset in 1..=7 {
             let reversed_offset = offset * -1;
             if stop {break;}
-            let cell_opt = Cell::new_from_cell(&self.cell, reversed_offset, offset);
+            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), reversed_offset, offset);
             stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
         } 
 
-        // rook moves
+        // rook-like moves
         stop = false;
         for offset in 1..=7 {
             if stop {break;}
-            let cell_opt = Cell::new_from_cell(&self.cell, offset, 0);
+            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), offset, 0);
             stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
         } 
         stop = false;
         for offset in 1..=7 {
             let reversed_offset = offset * -1;
             if stop {break;}
-            let cell_opt = Cell::new_from_cell(&self.cell, reversed_offset, 0);
+            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), reversed_offset, 0);
             stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
         } 
         stop = false;
         for offset in 1..=7 {
             if stop {break;}
-            let cell_opt = Cell::new_from_cell(&self.cell, 0, offset);
+            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), 0, offset);
             stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
         }
         stop = false;
         for offset in 1..=7 {
             let reversed_offset = offset * -1;
             if stop {break;}
-            let cell_opt = Cell::new_from_cell(&self.cell, 0, reversed_offset);
+            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), 0, reversed_offset);
             stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
         } 
 
