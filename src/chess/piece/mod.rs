@@ -4,6 +4,7 @@ pub mod knight;
 pub mod pawn;
 pub mod queen;
 pub mod rook;
+mod piece_utils;
 
 use super::cell::Cell;
 use super::types::{Role, PieceName};

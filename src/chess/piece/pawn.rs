@@ -120,7 +120,7 @@ mod tests {
         board.move_piece(PieceName::Epawn, false, &Cell::new("e5"));
         match board.get_piece_at_cell(&Cell::new("d4")) {
             Some(pawn) => {
-                assert!(pawn.is_valid_move(&board, &Move::parse("d5")));
+                assert!(pawn.is_valid_move(&board, &Move::parse("e5")));
             },
             None => panic!("Expected to find pawn")
         }
@@ -131,6 +131,19 @@ mod tests {
             },
             None => panic!("Expected to find pawn")
         }
+    }
+
+    #[test]
+    fn test_valid_take_white_and_black_move_opposite() {
+        let mut board = Board::new();
+        board.move_piece(PieceName::Dpawn, true, &Cell::new("e4"));
+        board.move_piece(PieceName::Epawn, false, &Cell::new("d5"));
+
+        let pawn = board.get_piece_at_cell(&Cell::new("e4")).expect("Expected to find pawn");
+        assert!(pawn.is_valid_move(&board, &Move::parse("d5")));
+
+        let pawn = board.get_piece_at_cell(&Cell::new("d5")).expect("Expected to find pawn");
+        assert!(pawn.is_valid_move(&board, &Move::parse("e4")));
     }
 
     #[test]

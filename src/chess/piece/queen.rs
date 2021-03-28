@@ -1,6 +1,6 @@
 use super::super::types::{PieceName, Role};
 use super::super::cell::Cell;
-use super::{Piece, PieceState, PieceStateTrait};
+use super::{Piece, PieceState, PieceStateTrait, Bishop, Rook};
 use super::super::board::Board;
 use super::super::chess_move::Move;
 
@@ -38,84 +38,10 @@ impl Queen {
         Cell {file: file, row: row}
     }
 
-    fn attempt_to_add_as_valid_cell(&self, cell_opt: Option<Cell>, board: &Board, valid_cells: &mut Vec<Cell>) -> bool {
-        let mut cont = true;
-        if let Some(cell) = cell_opt {
-            if let Some(piece) = board.get_piece_at_cell(&cell) {
-                if piece.is_white() != self.is_white() {
-                    valid_cells.push(cell.clone());
-                }
-                cont = false;
-            } else {
-                valid_cells.push(cell.clone());
-            }
-        } else {
-            cont = false;
-        }
-
-        cont
-    }
-
     fn get_valid_cells(&self, board: &Board) -> Vec<Cell> {
-        let mut valid_cells: Vec<Cell> = Vec::new();
-        let mut stop = false;
-
-        // bishop-like moves
-        for offset in 1..=7 {
-            if stop {break;}
-            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), offset, offset);
-            stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
-        } 
-        stop = false;
-        for offset in 1..=7 {
-            let reversed_offset = offset * -1;
-            if stop {break;}
-            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), offset, reversed_offset);
-            stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
-        } 
-        stop = false;
-        for offset in 1..=7 {
-            let reversed_offset = offset * -1;
-            if stop {break;}
-            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), reversed_offset, reversed_offset);
-            stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
-        } 
-        stop = false;
-        for offset in 1..=7 {
-            let reversed_offset = offset * -1;
-            if stop {break;}
-            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), reversed_offset, offset);
-            stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
-        } 
-
-        // rook-like moves
-        stop = false;
-        for offset in 1..=7 {
-            if stop {break;}
-            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), offset, 0);
-            stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
-        } 
-        stop = false;
-        for offset in 1..=7 {
-            let reversed_offset = offset * -1;
-            if stop {break;}
-            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), reversed_offset, 0);
-            stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
-        } 
-        stop = false;
-        for offset in 1..=7 {
-            if stop {break;}
-            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), 0, offset);
-            stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
-        }
-        stop = false;
-        for offset in 1..=7 {
-            let reversed_offset = offset * -1;
-            if stop {break;}
-            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), 0, reversed_offset);
-            stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
-        } 
-
+        let curr_cell = self.get_curr_cell();
+        let mut valid_cells: Vec<Cell> = Bishop::valid_bishop_cells(board, curr_cell);
+        valid_cells.append(&mut Rook::valid_rook_cells(board, curr_cell));
         valid_cells
     }
 }

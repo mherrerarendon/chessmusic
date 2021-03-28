@@ -3,7 +3,7 @@ use super::super::cell::Cell;
 use super::{Piece, PieceState, PieceStateTrait};
 use super::super::board::Board;
 use super::super::chess_move::Move;
-
+use super::piece_utils;
 
 pub struct Rook {
     pub state: PieceState
@@ -43,33 +43,16 @@ impl Rook {
         Cell {file: file, row: row}
     }
 
-    fn attempt_to_add_as_valid_cell(&self, cell_opt: Option<Cell>, board: &Board, valid_cells: &mut Vec<Cell>) -> bool {
-        let mut cont = true;
-        if let Some(cell) = cell_opt {
-            if let Some(piece) = board.get_piece_at_cell(&cell) {
-                if piece.is_white() != self.is_white() {
-                    valid_cells.push(cell.clone());
-                }
-                cont = false;
-            } else {
-                valid_cells.push(cell.clone());
-            }
-        } else {
-            cont = false;
-        }
-
-        cont
-    }
-
-    fn get_valid_cells(&self, board: &Board) -> Vec<Cell> {
+    pub fn valid_rook_cells(board: &Board, curr_cell: &Cell) -> Vec<Cell> {
+        let white = board.get_piece_at_cell(curr_cell).unwrap().is_white();
         let mut valid_cells: Vec<Cell> = Vec::new();
         let mut stop = false;
 
         // right
         for offset in 1..=7 {
             if stop {break;}
-            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), offset, 0);
-            stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
+            let cell_opt = Cell::new_from_cell(curr_cell, offset, 0);
+            stop = !piece_utils::attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells, white);
         } 
 
         // left
@@ -77,16 +60,16 @@ impl Rook {
         for offset in 1..=7 {
             let reversed_offset = offset * -1;
             if stop {break;}
-            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), reversed_offset, 0);
-            stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
+            let cell_opt = Cell::new_from_cell(curr_cell, reversed_offset, 0);
+            stop = !piece_utils::attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells, white);
         } 
 
         // up
         stop = false;
         for offset in 1..=7 {
             if stop {break;}
-            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), 0, offset);
-            stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
+            let cell_opt = Cell::new_from_cell(curr_cell, 0, offset);
+            stop = !piece_utils::attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells, white);
         }
 
         // down 
@@ -94,11 +77,15 @@ impl Rook {
         for offset in 1..=7 {
             let reversed_offset = offset * -1;
             if stop {break;}
-            let cell_opt = Cell::new_from_cell(self.get_curr_cell(), 0, reversed_offset);
-            stop = !self.attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells);
+            let cell_opt = Cell::new_from_cell(curr_cell, 0, reversed_offset);
+            stop = !piece_utils::attempt_to_add_as_valid_cell(cell_opt, &board, &mut valid_cells, white);
         } 
 
         valid_cells
+    }
+
+    fn get_valid_cells(&self, board: &Board) -> Vec<Cell> {
+        Rook::valid_rook_cells(board, self.get_curr_cell())
     }
 }
 
