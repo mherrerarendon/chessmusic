@@ -8,30 +8,30 @@ use std::{vec};
 
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub struct Pitch {
+pub struct Note {
     pub base_midi: i32,
     pub adjustment: i32
 }
 
-impl Pitch {
+impl Note {
     #[allow(dead_code)]
-    fn new(file: char) -> Pitch {
-        Pitch {
-            base_midi: Pitch::file_to_midi(file),
+    fn new(file: char) -> Note {
+        Note {
+            base_midi: Note::file_to_midi(file),
             adjustment: 0
         }
     }
-    fn new_with_cell(cell: &Cell) -> Pitch {
-        Pitch {
-            base_midi: Pitch::file_to_midi(cell.file),
+    fn new_with_cell(cell: &Cell) -> Note {
+        Note {
+            base_midi: Note::file_to_midi(cell.file),
             adjustment: cell.row - 1
         }
     }
 
     // transposition is x and y on a chess board
-    fn new_with_cell_diff(&self, cell_diff: (i32, i32)) -> Pitch {
+    fn new_with_cell_diff(&self, cell_diff: (i32, i32)) -> Note {
         let (x, y) = cell_diff;
-         Pitch {
+         Note {
             base_midi: self.base_midi + (y * 2),
             adjustment: self.adjustment + x
         }
@@ -56,9 +56,9 @@ impl Pitch {
         (self.base_midi + self.adjustment) as u8
     }
 
-    pub fn get_pitches_from_cell_history(cell_history: &Vec<Cell>) -> Vec<Pitch> {
+    pub fn get_pitches_from_cell_history(cell_history: &Vec<Cell>) -> Vec<Note> {
         let base_cell = cell_history[0];
-        let base_pitch = Pitch::new_with_cell(&base_cell);
+        let base_pitch = Note::new_with_cell(&base_cell);
         let mut pitches = vec![base_pitch];
 
         for cell in cell_history[1..].iter() {
@@ -76,14 +76,14 @@ mod tests {
 
     #[test]
     fn test_new_pitch_with_cell() {
-        let pitch = Pitch::new_with_cell(&Cell::new("a1"));
+        let pitch = Note::new_with_cell(&Cell::new("a1"));
         assert_eq!(pitch.base_midi, 57);
         assert_eq!(pitch.adjustment, 0);
     }
 
     #[test]
     fn test_new_pitch_with_cell_diff() {
-        let pitch = Pitch::new('a');
+        let pitch = Note::new('a');
         let new_pitch = pitch.new_with_cell_diff((0, 1));
         assert_eq!(new_pitch.base_midi, 59);
         assert_eq!(new_pitch.adjustment, 0);
@@ -96,9 +96,9 @@ mod tests {
     #[test]
     fn test_get_pitches_from_cell_history() {
         let cell_history = vec![Cell::new("a2"), Cell::new("a3"), Cell::new("a4")];
-        let pitches = Pitch::get_pitches_from_cell_history(&cell_history);
-        assert_eq!(pitches[0], Pitch {base_midi: 57, adjustment: 1});
-        assert_eq!(pitches[1], Pitch {base_midi: 59, adjustment: 1});
-        assert_eq!(pitches[2], Pitch {base_midi: 61, adjustment: 1});
+        let pitches = Note::get_pitches_from_cell_history(&cell_history);
+        assert_eq!(pitches[0], Note {base_midi: 57, adjustment: 1});
+        assert_eq!(pitches[1], Note {base_midi: 59, adjustment: 1});
+        assert_eq!(pitches[2], Note {base_midi: 61, adjustment: 1});
     }
 }

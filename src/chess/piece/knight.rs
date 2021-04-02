@@ -27,7 +27,8 @@ impl Knight {
                 white: white, 
                 role: Role::Knight, 
                 first_move: true, 
-                cell: Knight::init_cell(white, name)
+                cell: Knight::init_cell(white, name),
+                cell_history: Vec::new()
             }
         }
     }

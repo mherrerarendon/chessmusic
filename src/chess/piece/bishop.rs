@@ -28,7 +28,8 @@ impl Bishop {
                 white: white, 
                 role: Role::Bishop, 
                 first_move: true, 
-                cell: Bishop::init_cell(white, name)
+                cell: Bishop::init_cell(white, name), 
+                cell_history: Vec::new()
             }
         }
     }

@@ -23,7 +23,16 @@ pub struct PieceState {
     pub white: bool, 
     pub role: Role,
     pub cell: Cell,
-    pub first_move: bool
+    pub first_move: bool,
+    pub cell_history: Vec<Cell>
+}
+
+impl<'a> Iterator for &'a PieceState {
+    type Item = &'a Cell;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.cell_history.iter().next()
+    }
 }
 
 impl PieceStateTrait for PieceState {

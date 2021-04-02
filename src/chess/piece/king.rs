@@ -27,7 +27,8 @@ impl King {
                 white: white, 
                 role: Role::King, 
                 first_move: true, 
-                cell: King::init_cell(white)
+                cell: King::init_cell(white),
+                cell_history: Vec::new()
             }
         }
     }

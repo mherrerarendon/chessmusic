@@ -27,7 +27,8 @@ impl Queen {
                 white: white, 
                 role: Role::Queen, 
                 first_move: true, 
-                cell: Queen::init_cell(white)
+                cell: Queen::init_cell(white),
+                cell_history: Vec::new()
             }
         }
     }

@@ -27,9 +27,9 @@ impl Rook {
                 white: white, 
                 role: Role::Rook, 
                 first_move: true, 
-                cell: Rook::init_cell(white, name)
+                cell: Rook::init_cell(white, name),
+                cell_history: Vec::new()
             }
-
         }
     }
 

@@ -26,7 +26,8 @@ impl Pawn {
                 white: white, 
                 role: Role::Pawn, 
                 first_move: true, 
-                cell: Pawn::init_cell(white, name)
+                cell: Pawn::init_cell(white, name),
+                cell_history: Vec::new()
             }
         }
     }

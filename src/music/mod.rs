@@ -1,5 +1,5 @@
-pub mod pitch;
+pub mod note;
 pub mod midi_player;
 
-pub use pitch::Pitch as Pitch;
+pub use note::Note as Note;
 pub use midi_player::MidiPlayer as MidiPlayer;
