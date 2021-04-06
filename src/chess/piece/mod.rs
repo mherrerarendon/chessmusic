@@ -22,38 +22,31 @@ pub struct PieceState {
     pub name: PieceName,
     pub white: bool, 
     pub role: Role,
-    pub cell: Cell,
-    pub first_move: bool,
-    pub cell_history: Vec<Cell>
-}
-
-impl<'a> Iterator for &'a PieceState {
-    type Item = &'a Cell;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.cell_history.iter().next()
-    }
+    pub cell: Option<Cell>,
+    pub move_history: Vec<Move>
 }
 
 impl PieceStateTrait for PieceState {
     fn get_name(&self) -> PieceName {self.name}
     fn is_white(&self) -> bool {self.white}
     fn get_role(&self) -> Role {self.role}
-    fn get_curr_cell(&self) -> &Cell {&self.cell}
-    fn set_new_cell(&mut self, cell: &Cell) {
-        self.cell = cell.clone();
-        self.first_move = false;
+    fn get_curr_cell(&self) -> Option<Cell> {self.cell}
+    fn move_(&mut self, the_move: &Move) {
+        self.cell = Some(the_move.cell);
+        self.move_history.push(*the_move.clone());
     }
-    fn has_moved(&self) -> bool {!self.first_move}
+    fn has_moved(&self) -> bool {self.move_history.len() > 0}
+    fn get_move_history(&self) -> &[Move] {&self.move_history}
 }
 
 pub trait PieceStateTrait {
     fn get_name(&self) -> PieceName;
     fn is_white(&self) -> bool;
     fn get_role(&self) -> Role;
-    fn get_curr_cell(&self) -> &Cell;
-    fn set_new_cell(&mut self, cell: &Cell); 
+    fn get_curr_cell(&self) -> Option<Cell>;
+    fn move_(&mut self, the_move: &Move); 
     fn has_moved(&self) -> bool;
+    fn get_move_history(&self) -> &[Move];
 }
 
 
@@ -62,9 +55,10 @@ pub trait Piece {
     fn get_name(&self) -> PieceName {self.get_state().get_name()}
     fn is_white(&self) -> bool {self.get_state().is_white()}
     fn get_role(&self) -> Role {self.get_state().get_role()}
-    fn get_curr_cell(&self) -> &Cell {self.get_state().get_curr_cell()}
+    fn get_curr_cell(&self) -> Option<Cell> {self.get_state().get_curr_cell()}
     fn has_moved(&self) -> bool {self.get_state().has_moved()}
-    fn set_new_cell(&mut self, cell: &Cell) {self.get_mut_state().set_new_cell(cell)}
+    fn move_(&mut self, the_move: &Move) {self.get_mut_state().move_(the_move)}
+    fn get_move_history(&self) -> &[Move] {self.get_state().get_move_history()}
 
     fn get_char_representation(&self) -> char;
     fn get_state(&self) -> Box<&dyn PieceStateTrait>;

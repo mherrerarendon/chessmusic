@@ -1,5 +1,6 @@
 use super::types::{Role, PieceName};
 use super::cell::Cell;
+use super::Move;
 use super::piece::{Piece, Bishop, King, Knight, Pawn, Queen, Rook};
 
 
@@ -113,7 +114,13 @@ impl Board {
     }
 
     pub fn get_piece_at_cell(&self, cell: &Cell) -> Option<&Box<dyn Piece>> {
-        self.pieces.iter().find(|piece| piece.get_curr_cell() == cell)
+        self.pieces.iter().find(|piece| {
+            if let Some(piece_cell) = piece.get_curr_cell() {
+                piece_cell == *cell
+            } else {
+                false
+            }
+        })
     }
 
     pub fn get_piece_with_name(&self, name: PieceName, white: bool) -> Option<&Box<dyn Piece>> {
@@ -136,10 +143,10 @@ impl Board {
         }
     }
 
-    pub fn move_piece(&mut self, name: PieceName, white: bool, cell: &Cell) {
-        self.remove_piece_at_cell(cell);
+    pub fn move_piece(&mut self, name: PieceName, white: bool, the_move: &Move) {
+        self.remove_piece_at_cell(&the_move.cell);
         let piece = self.get_mut_piece_with_name(name, white).expect("unable to move piece");
-        piece.set_new_cell(&cell);
+        piece.move_(the_move);
     }
 }
 
@@ -182,7 +189,7 @@ mod tests {
     fn test_move_pawn() {
         let mut board = Board::new();
         let new_cell = Cell::new("b3");
-        board.move_piece(PieceName::Bpawn, true, &new_cell);
+        board.move_piece(PieceName::Bpawn, true, &Move::new_with_cell(new_cell));
         match board.get_piece_at_cell(&new_cell) {
             Some(piece) => {
                 assert_eq!(piece.get_name(), PieceName::Bpawn);
@@ -197,7 +204,7 @@ mod tests {
     fn test_move_knight() {
         let mut board = Board::new();
         let new_cell = Cell::new("a3");
-        board.move_piece(PieceName::Qknight, true, &new_cell);
+        board.move_piece(PieceName::Qknight, true, &Move::new_with_cell(new_cell));
         match board.get_piece_at_cell(&new_cell) {
             Some(piece) => {
                 assert_eq!(piece.get_name(), PieceName::Qknight);

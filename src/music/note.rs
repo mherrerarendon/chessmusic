@@ -10,21 +10,31 @@ use std::{vec};
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Note {
     pub base_midi: i32,
-    pub adjustment: i32
+    pub adjustment: i32,
+    pub velocity: i32
 }
 
 impl Note {
-    #[allow(dead_code)]
-    fn new(file: char) -> Note {
+    pub fn new(midi_note: i32) -> Note {
         Note {
-            base_midi: Note::file_to_midi(file),
-            adjustment: 0
+            base_midi: midi_note,
+            adjustment: 0,
+            velocity: 80
         }
     }
-    fn new_with_cell(cell: &Cell) -> Note {
+    #[allow(dead_code)]
+    fn new_with_file(file: char) -> Note {
+        Note {
+            base_midi: Note::file_to_midi(file),
+            adjustment: 0,
+            velocity: 80
+        }
+    }
+    pub fn new_with_cell(cell: &Cell) -> Note {
         Note {
             base_midi: Note::file_to_midi(cell.file),
-            adjustment: cell.row - 1
+            adjustment: cell.row - 1,
+            velocity: 80
         }
     }
 
@@ -33,8 +43,13 @@ impl Note {
         let (x, y) = cell_diff;
          Note {
             base_midi: self.base_midi + (y * 2),
-            adjustment: self.adjustment + x
+            adjustment: self.adjustment + x,
+            velocity: 80
         }
+    }
+
+    pub fn new_with_transpsition(&self, whole_steps: i32, half_steps: i32) -> Note {
+        return self.new_with_cell_diff((half_steps, whole_steps));
     }
 
     fn file_to_midi(file: char) -> i32 {
@@ -83,7 +98,7 @@ mod tests {
 
     #[test]
     fn test_new_pitch_with_cell_diff() {
-        let pitch = Note::new('a');
+        let pitch = Note::new_with_file('a');
         let new_pitch = pitch.new_with_cell_diff((0, 1));
         assert_eq!(new_pitch.base_midi, 59);
         assert_eq!(new_pitch.adjustment, 0);
@@ -97,8 +112,8 @@ mod tests {
     fn test_get_pitches_from_cell_history() {
         let cell_history = vec![Cell::new("a2"), Cell::new("a3"), Cell::new("a4")];
         let pitches = Note::get_pitches_from_cell_history(&cell_history);
-        assert_eq!(pitches[0], Note {base_midi: 57, adjustment: 1});
-        assert_eq!(pitches[1], Note {base_midi: 59, adjustment: 1});
-        assert_eq!(pitches[2], Note {base_midi: 61, adjustment: 1});
+        assert_eq!(pitches[0], Note {base_midi: 57, adjustment: 1, velocity: 80});
+        assert_eq!(pitches[1], Note {base_midi: 59, adjustment: 1, velocity: 80});
+        assert_eq!(pitches[2], Note {base_midi: 61, adjustment: 1, velocity: 80});
     }
 }

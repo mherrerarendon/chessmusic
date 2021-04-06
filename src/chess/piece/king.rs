@@ -26,9 +26,8 @@ impl King {
                 name: PieceName::King, 
                 white: white, 
                 role: Role::King, 
-                first_move: true, 
-                cell: King::init_cell(white),
-                cell_history: Vec::new()
+                cell: Some(King::init_cell(white)),
+                move_history: Vec::new()
             }
         }
     }
@@ -42,14 +41,15 @@ impl King {
     fn get_valid_cells(&self, board: &Board) -> Vec<Cell> {
         let mut valid_cells: Vec<Cell> = Vec::new();
         let is_white = self.is_white();
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), 0, 1), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), 1, 1), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), 1, 0), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), 1, -1), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), 0, -1), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), -1, -1), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), -1, 0), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), -1, 1), &board, &mut valid_cells, is_white);
+        let curr_cell = self.get_curr_cell().unwrap();
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, 0, 1), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, 1, 1), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, 1, 0), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, 1, -1), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, 0, -1), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, -1, -1), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, -1, 0), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, -1, 1), &board, &mut valid_cells, is_white);
 
         valid_cells
     }

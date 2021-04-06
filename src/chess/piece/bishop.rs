@@ -27,9 +27,8 @@ impl Bishop {
                 name: name, 
                 white: white, 
                 role: Role::Bishop, 
-                first_move: true, 
-                cell: Bishop::init_cell(white, name), 
-                cell_history: Vec::new()
+                cell: Some(Bishop::init_cell(white, name)),
+                move_history: Vec::new()
             }
         }
     }
@@ -87,7 +86,7 @@ impl Bishop {
     }
 
     fn get_valid_cells(&self, board: &Board) -> Vec<Cell> {
-        Bishop::valid_bishop_cells(board, self.get_curr_cell())
+        Bishop::valid_bishop_cells(board, &self.get_curr_cell().unwrap())
     }
 }
 

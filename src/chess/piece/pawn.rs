@@ -25,9 +25,8 @@ impl Pawn {
                 name: name, 
                 white: white, 
                 role: Role::Pawn, 
-                first_move: true, 
-                cell: Pawn::init_cell(white, name),
-                cell_history: Vec::new()
+                cell: Some(Pawn::init_cell(white, name)),
+                move_history: Vec::new()
             }
         }
     }
@@ -68,18 +67,19 @@ impl Pawn {
     fn get_valid_cells(&self, board: &Board) -> Vec<Cell> {
         let mut valid_cells: Vec<Cell> = Vec::new();
         let direction = if self.is_white() {1} else {-1};
+        let curr_cell = self.get_curr_cell().unwrap();
         if !self.has_moved() {
-            let double_forward_cell_option = Cell::new_from_cell(self.get_curr_cell(), 0, 2 * direction);
+            let double_forward_cell_option = Cell::new_from_cell(&curr_cell, 0, 2 * direction);
             valid_cells = self.add_cell_if_valid(board, double_forward_cell_option, false, valid_cells);
         }
 
-        let take_left_cell_option = Cell::new_from_cell(self.get_curr_cell(), -1, 1 * direction);
+        let take_left_cell_option = Cell::new_from_cell(&curr_cell, -1, 1 * direction);
         valid_cells = self.add_cell_if_valid(board, take_left_cell_option, true, valid_cells);
 
-        let take_right_cell_option = Cell::new_from_cell(self.get_curr_cell(), 1, 1 * direction);
+        let take_right_cell_option = Cell::new_from_cell(&curr_cell, 1, 1 * direction);
         valid_cells = self.add_cell_if_valid(board, take_right_cell_option, true, valid_cells);
 
-        let single_forward_cell_option = Cell::new_from_cell(self.get_curr_cell(), 0, 1 * direction);
+        let single_forward_cell_option = Cell::new_from_cell(&curr_cell, 0, 1 * direction);
         valid_cells = self.add_cell_if_valid(board, single_forward_cell_option, false, valid_cells);
 
         valid_cells
@@ -117,8 +117,8 @@ mod tests {
     #[test]
     fn test_valid_take_white_and_black_move() {
         let mut board = Board::new();
-        board.move_piece(PieceName::Dpawn, true, &Cell::new("d4"));
-        board.move_piece(PieceName::Epawn, false, &Cell::new("e5"));
+        board.move_piece(PieceName::Dpawn, true, &Move::new_with_cell_name("d4"));
+        board.move_piece(PieceName::Epawn, false, &Move::new_with_cell_name("e5"));
         match board.get_piece_at_cell(&Cell::new("d4")) {
             Some(pawn) => {
                 assert!(pawn.is_valid_move(&board, &Move::parse("e5")));
@@ -137,8 +137,8 @@ mod tests {
     #[test]
     fn test_valid_take_white_and_black_move_opposite() {
         let mut board = Board::new();
-        board.move_piece(PieceName::Dpawn, true, &Cell::new("e4"));
-        board.move_piece(PieceName::Epawn, false, &Cell::new("d5"));
+        board.move_piece(PieceName::Dpawn, true, &Move::new_with_cell_name("e4"));
+        board.move_piece(PieceName::Epawn, false, &Move::new_with_cell_name("d5"));
 
         let pawn = board.get_piece_at_cell(&Cell::new("e4")).expect("Expected to find pawn");
         assert!(pawn.is_valid_move(&board, &Move::parse("d5")));
@@ -150,7 +150,7 @@ mod tests {
     #[test]
     fn test_take_same_color_pawn_is_invalid() {
         let mut board = Board::new();
-        board.move_piece(PieceName::Dpawn, true, &Cell::new("d3"));
+        board.move_piece(PieceName::Dpawn, true, &Move::new_with_cell_name("d3"));
         match board.get_piece_at_cell(&Cell::new("c2")) {
             Some(pawn) => {
                 assert!(!pawn.is_valid_move(&board, &Move::parse("d3")));

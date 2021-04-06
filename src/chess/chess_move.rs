@@ -34,6 +34,26 @@ impl Move {
         }
     }
 
+    pub fn new_with_cell_name(cell_name: &str) -> Move {
+        Move {
+            role: Role::Pawn,
+            move_type: MoveType::None,
+            file_hint: ' ',
+            check: false,
+            cell: Cell::new(cell_name)
+        }
+    }
+
+    pub fn new_with_cell(cell: Cell) -> Move {
+        Move {
+            role: Role::Pawn,
+            move_type: MoveType::None,
+            file_hint: ' ',
+            check: false,
+            cell: cell
+        }
+    }
+
     fn parse_castle_move(move_str: &str) -> Move {
         let clean_move_str: String = move_str.chars().filter(|&x| x != '+' && x != '#').collect();
         let mut the_move: Move = Move::new();

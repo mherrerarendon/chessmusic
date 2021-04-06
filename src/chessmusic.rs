@@ -1,6 +1,8 @@
+use crate::chess::types::MoveType;
+
 use super::pgn;
 use super::chess;
-use super::music::{MidiPlayer, Note};
+use super::music::{MidiPlayer, Note, Melody};
 
 use std::sync::mpsc;
 
@@ -46,53 +48,42 @@ struct ChessMusic {
     game: chess::Game
 }
 
-impl Iterator for ChessMusic {
-    type Item = Vec<Note>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.cell_history.iter().next()
-    }
-}
-
-fn get_pitches_for_piece(piece_name: chess::PieceName, white: bool, moves: &Vec<(chess::Move, chess::Move)>) -> Vec<Note> {
-    let piece_history = chess::Game::get_piece_history(piece_name, white, &moves);
-    Note::get_pitches_from_cell_history(&piece_history)
-}
-
-fn generate_pitches_by_pieces(pieces: &[(chess::PieceName, bool)], tx: mpsc::Sender<Vec<Note>>, moves: &Vec<(chess::Move, chess::Move)>) {
+fn generate_pitches_by_pieces(pieces: &[(chess::PieceName, bool)], tx: mpsc::Sender<Melody>, game: &chess::Game) {
     crossbeam::scope(|s| {
         for (piece_name, white) in pieces.iter() {
             let tx1 = mpsc::Sender::clone(&tx);
             s.spawn(move |_| {
-                let pitches = get_pitches_for_piece(*piece_name, *white, &moves);
-                tx1.send(pitches).unwrap();
+                let move_history_with_captures = game.board.get_piece_with_name(*piece_name, *white).unwrap().get_move_history().iter()
+                    .map(|move_| (move_.cell, move_.move_type == MoveType::Take)).collect::<Vec<_>>();
+                let melody = Melody::new(&move_history_with_captures, Note::new(120));
+                tx1.send(melody).unwrap();
             });
         }
     }).unwrap();
 }
 
-fn receive_pitches_by_piece(pieces: &[(chess::PieceName, bool)], rx: mpsc::Receiver<Vec<Note>>) -> Vec<Vec<Note>> {
-    let mut pitches_by_piece: Vec<Vec<Note>> = Vec::with_capacity(pieces.len());
+fn receive_pitches_by_piece(pieces: &[(chess::PieceName, bool)], rx: mpsc::Receiver<Melody>) -> Vec<Melody> {
+    let mut melodies: Vec<Melody> = Vec::with_capacity(pieces.len());
 
     for _ in 0..pieces.len() {
         match rx.recv() {
-            Ok(pitches) => pitches_by_piece.push(pitches),
+            Ok(melody) => melodies.push(melody),
             Err(the_error) => {
                 println!("{}", the_error.to_string())
             }
         }
     }
 
-    pitches_by_piece
+    melodies
 }
 
-fn chords_from_pitches_by_piece(pitches_by_piece: &Vec<Vec<Note>>) -> Vec<Vec<Note>> {
+fn chords_from_pitches_by_piece(melodies: &[Melody]) -> Vec<Vec<Note>> {
     let mut chords: Vec<Vec<Note>> = Vec::new();
-    let longest_length = pitches_by_piece.iter().max_by_key(|pitches| pitches.len()).unwrap().len();
+    let longest_length = melodies.iter().max_by_key(|pitches| pitches.notes.len()).unwrap().notes.len();
     for n in 0..longest_length {
         let mut chord: Vec<Note> = Vec::new();
-        for pitches in pitches_by_piece.iter() {
-            if let Some(pitch) =  pitches.get(n) {
+        for pitches in melodies.iter() {
+            if let Some(pitch) =  pitches.notes.get(n) {
                 chord.push(*pitch);
             }
         }
@@ -105,17 +96,18 @@ fn chords_from_pitches_by_piece(pitches_by_piece: &Vec<Vec<Note>>) -> Vec<Vec<No
 pub fn play_game(game_str: &str) {
     let str_moves = pgn::parse_moves(game_str);
     let moves = chess::Move::parse_moves(&str_moves);
+    let game = chess::Game::new_with_moves(&moves);
 
-    // let (tx, rx): (mpsc::Sender<Vec<Note>>, mpsc::Receiver<Vec<Note>>) = mpsc::channel();
-    // generate_pitches_by_pieces(PIECES, tx, &moves);
-    // let pitches_by_piece = receive_pitches_by_piece(PIECES, rx);
-    // let chords = chords_from_pitches_by_piece(&pitches_by_piece);
+    let (tx, rx): (mpsc::Sender<Melody>, mpsc::Receiver<Melody>) = mpsc::channel();
+    generate_pitches_by_pieces(PIECES, tx, &game);
+    let pitches_by_piece = receive_pitches_by_piece(PIECES, rx);
+    let chords = chords_from_pitches_by_piece(&pitches_by_piece);
 
-    // let mut midi_player = MidiPlayer::new();
-    // for chord in chords.iter() {
-    //     let notes: Vec<u8> = chord.iter().map(|pitch|pitch.as_midi()).collect();
-    //     midi_player.play_notes(&notes);
-    // }
+    let mut midi_player = MidiPlayer::new();
+    for chord in chords.iter() {
+        let notes: Vec<u8> = chord.iter().map(|pitch|pitch.as_midi()).collect();
+        midi_player.play_notes(&notes);
+    }
 }
 
 #[cfg(test)]

@@ -26,9 +26,8 @@ impl Queen {
                 name: PieceName::Queen, 
                 white: white, 
                 role: Role::Queen, 
-                first_move: true, 
-                cell: Queen::init_cell(white),
-                cell_history: Vec::new()
+                cell: Some(Queen::init_cell(white)),
+                move_history: Vec::new()
             }
         }
     }
@@ -40,9 +39,9 @@ impl Queen {
     }
 
     fn get_valid_cells(&self, board: &Board) -> Vec<Cell> {
-        let curr_cell = self.get_curr_cell();
-        let mut valid_cells: Vec<Cell> = Bishop::valid_bishop_cells(board, curr_cell);
-        valid_cells.append(&mut Rook::valid_rook_cells(board, curr_cell));
+        let curr_cell = self.get_curr_cell().unwrap();
+        let mut valid_cells: Vec<Cell> = Bishop::valid_bishop_cells(board, &curr_cell);
+        valid_cells.append(&mut Rook::valid_rook_cells(board, &curr_cell));
         valid_cells
     }
 }

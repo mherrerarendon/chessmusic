@@ -26,9 +26,8 @@ impl Rook {
                 name: name, 
                 white: white, 
                 role: Role::Rook, 
-                first_move: true, 
-                cell: Rook::init_cell(white, name),
-                cell_history: Vec::new()
+                cell: Some(Rook::init_cell(white, name)),
+                move_history: Vec::new()
             }
         }
     }
@@ -85,7 +84,7 @@ impl Rook {
     }
 
     fn get_valid_cells(&self, board: &Board) -> Vec<Cell> {
-        Rook::valid_rook_cells(board, self.get_curr_cell())
+        Rook::valid_rook_cells(board, &self.get_curr_cell().unwrap())
     }
 }
 

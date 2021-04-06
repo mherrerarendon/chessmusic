@@ -26,9 +26,8 @@ impl Knight {
                 name: name, 
                 white: white, 
                 role: Role::Knight, 
-                first_move: true, 
-                cell: Knight::init_cell(white, name),
-                cell_history: Vec::new()
+                cell: Some(Knight::init_cell(white, name)),
+                move_history: Vec::new()
             }
         }
     }
@@ -46,14 +45,15 @@ impl Knight {
     fn get_valid_cells(&self, board: &Board) -> Vec<Cell> {
         let mut valid_cells: Vec<Cell> = Vec::new();
         let is_white = self.is_white();
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), 1, 2), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), 2, 1), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), 2, -1), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), 1, -2), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), -1, -2), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), -2, -1), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), -2, 1), &board, &mut valid_cells, is_white);
-        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(self.get_curr_cell(), -1, 2), &board, &mut valid_cells, is_white);
+        let curr_cell = self.get_curr_cell().unwrap();
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, 1, 2), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, 2, 1), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, 2, -1), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, 1, -2), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, -1, -2), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, -2, -1), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, -2, 1), &board, &mut valid_cells, is_white);
+        piece_utils::attempt_to_add_as_valid_cell(Cell::new_from_cell(&curr_cell, -1, 2), &board, &mut valid_cells, is_white);
 
         valid_cells
     }
@@ -75,9 +75,9 @@ mod tests {
             None => panic!("expected to find piece")
         }
 
-        let new_cell = Cell::new("a3");
-        board.move_piece(PieceName::Qknight, true, &new_cell);
-        match board.get_piece_at_cell(&new_cell) {
+        let cell = Cell::new("a3");
+        board.move_piece(PieceName::Qknight, true, &Move::new_with_cell(cell));
+        match board.get_piece_at_cell(&cell) {
             Some(knight) => {
                 assert!(knight.is_valid_move(&board, &Move::parse("c4")));
                 assert!(knight.is_valid_move(&board, &Move::parse("b1")));
@@ -100,7 +100,7 @@ mod tests {
         }
 
         let new_cell = Cell::new("h6");
-        board.move_piece(PieceName::Kknight, false, &new_cell);
+        board.move_piece(PieceName::Kknight, false, &Move::new_with_cell(new_cell));
         match board.get_piece_at_cell(&new_cell) {
             Some(knight) => {
                 assert!(knight.is_valid_move(&board, &Move::parse("g8")));
