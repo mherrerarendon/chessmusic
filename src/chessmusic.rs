@@ -2,9 +2,11 @@ use crate::chess::types::MoveType;
 
 use super::pgn;
 use super::chess;
+use super::chess::{piece::Piece};
 use super::music::{MidiPlayer, Note, Melody};
 
 use std::sync::mpsc;
+use std::sync::Arc;
 
 extern crate crossbeam;
 
@@ -52,10 +54,11 @@ fn generate_pitches_by_pieces(pieces: &[(chess::PieceName, bool)], tx: mpsc::Sen
     crossbeam::scope(|s| {
         for (piece_name, white) in pieces.iter() {
             let tx1 = mpsc::Sender::clone(&tx);
+            let piece = game.board.get_piece_with_name(*piece_name, *white);
+            let history = piece.get_cell_and_capture_history();
             s.spawn(move |_| {
-                let move_history_with_captures = game.board.get_piece_with_name(*piece_name, *white).unwrap().get_move_history().iter()
-                    .map(|move_| (move_.cell, move_.move_type == MoveType::Take)).collect::<Vec<_>>();
-                let melody = Melody::new(&move_history_with_captures, Note::new(120));
+                // TODO: initial not is wrong.
+                let melody = Melody::new(&history, Note::new(120));
                 tx1.send(melody).unwrap();
             });
         }
@@ -110,7 +113,7 @@ pub fn play_game(game_str: &str) {
     }
 }
 
-#[cfg(test)]
+#[cfg(testss)]
 mod tests {
     use super::*;
 

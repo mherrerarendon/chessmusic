@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use super::types::{Role, PieceName};
 use super::cell::Cell;
 use super::Move;
@@ -123,29 +125,45 @@ impl Board {
         })
     }
 
-    pub fn get_piece_with_name(&self, name: PieceName, white: bool) -> Option<&Box<dyn Piece>> {
-        self.pieces.iter().find(|piece| piece.get_name() == name && piece.is_white() == white)
+    pub fn get_mut_piece_at_cell(&mut self, cell: &Cell) -> Option<&mut Box<dyn Piece>> {
+        self.pieces.iter_mut().find(|piece| {
+            if let Some(piece_cell) = piece.get_curr_cell() {
+                piece_cell == *cell
+            } else {
+                false
+            }
+        })
     }
 
-    fn get_mut_piece_with_name(&mut self, name: PieceName, white: bool) -> Option<&mut Box<dyn Piece>> {
-        self.pieces.iter_mut().find(|piece| piece.get_name() == name && piece.is_white() == white)
+    pub fn get_live_piece_with_name(&self, name: PieceName, white: bool) -> Option<&Box<dyn Piece>> {
+        self.pieces.iter().find(|piece| piece.get_name() == name && piece.is_white() == white && piece.get_curr_cell().is_some())
+    }
+
+    pub fn get_piece_with_name(&self, name: PieceName, white: bool) -> &Box<dyn Piece> {
+        self.pieces.iter().find(|piece| piece.get_name() == name && piece.is_white() == white).unwrap()
+    }
+
+    pub fn get_mut_live_piece_with_name(&mut self, name: PieceName, white: bool) -> Option<&mut Box<dyn Piece>> {
+        self.pieces.iter_mut().find(|piece| piece.get_name() == name && piece.is_white() == white && piece.get_curr_cell().is_some())
+    }
+
+    fn get_mut_piece_with_name(&mut self, name: PieceName, white: bool) -> &mut Box<dyn Piece> {
+        self.pieces.iter_mut().find(|piece| piece.get_name() == name && piece.is_white() == white).unwrap()
     }
 
     pub fn get_pieces_with_role(&self, role: Role, white: bool) -> Vec<&Box<dyn Piece>> {
         return self.pieces.iter().filter(|piece| piece.get_role() == role && piece.is_white() == white).collect();
     }
 
-    fn remove_piece_at_cell(&mut self, cell: &Cell) {
-        if let Some(piece) = self.get_piece_at_cell(&cell) {
-            let index = self.pieces.iter()
-                .position(|x| (x.get_name() == piece.get_name() && x.is_white() == piece.is_white())).unwrap();
-            self.pieces.remove(index);
+    fn capture_piece_at_cell(&mut self, cell: &Cell) {
+        if let Some(piece) = self.get_mut_piece_at_cell(&cell) {
+            piece.set_captured()
         }
     }
 
     pub fn move_piece(&mut self, name: PieceName, white: bool, the_move: &Move) {
-        self.remove_piece_at_cell(&the_move.cell);
-        let piece = self.get_mut_piece_with_name(name, white).expect("unable to move piece");
+        self.capture_piece_at_cell(&the_move.cell);
+        let piece = self.get_mut_live_piece_with_name(name, white).expect("unable to move piece");
         piece.move_(the_move);
     }
 }
@@ -226,7 +244,7 @@ mod tests {
     fn test_remove_piece() {
         let mut board = Board::new();
         let cell = Cell::new("a1");
-        board.remove_piece_at_cell(&cell);
+        board.capture_piece_at_cell(&cell);
         match board.get_piece_at_cell(&cell) {
             Some(_piece) => panic!("Did not expect to find piece"),
             None => assert!(true)

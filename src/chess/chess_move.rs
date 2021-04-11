@@ -3,6 +3,7 @@ use super::cell::Cell;
 
 use std::fmt;
 
+#[derive(Clone)]
 pub struct Move {
     pub role: Role,
     pub move_type: MoveType,

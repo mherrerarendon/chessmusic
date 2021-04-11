@@ -92,9 +92,10 @@ impl Game {
              
     }
 
-    pub fn get_piece_history(self, name: PieceName, white: bool) -> Vec<Cell> {
-        let piece = self.board.get_piece_with_name(name, white).unwrap();
-        piece.get_move_history().iter().map(|move_|move_.cell).collect()
+    pub fn get_piece_history(&self, name: PieceName, white: bool) -> Vec<Cell> {
+        let piece = self.board.get_piece_with_name(name, white);
+        let cells = piece.get_cell_and_capture_history().iter().map(|(cell, _)| *cell).collect::<Vec<_>>();
+        cells
     }
 
     pub fn load_moves(&mut self, moves: &[Move]) {
@@ -105,14 +106,6 @@ impl Game {
         }
     }
 }
-
-// impl Iterator for Game {
-//     type Item = &'a Cell;
-
-//     fn next(&mut self) -> Option<Self::Item> {
-//         self.cell_history.iter().next()
-//     }
-// }
 
 #[cfg(test)]
 mod tests {
@@ -217,65 +210,66 @@ mod tests {
         let mut game = Game::new();
 
         game.add_move_pair(&Move::parse("d4"), &Move::parse("Nf6"));
-        let white_piece = game.board.get_piece_with_name(PieceName::Dpawn, true).unwrap();
-        let black_piece = game.board.get_piece_with_name(PieceName::Kknight, false).unwrap();
+        game.board.dump();
+        let white_piece = game.board.get_live_piece_with_name(PieceName::Dpawn, true).unwrap();
+        let black_piece = game.board.get_live_piece_with_name(PieceName::Kknight, false).unwrap();
         assert_eq!(white_piece.get_curr_cell().unwrap(), Cell::new("d4"));
         assert_eq!(black_piece.get_curr_cell().unwrap(), Cell::new("f6"));
 
         game.add_move_pair(&Move::parse("Bf4"), &Move::parse("Nc6"));
-        let white_piece = game.board.get_piece_with_name(PieceName::Qbishop, true).unwrap();
-        let black_piece = game.board.get_piece_with_name(PieceName::Qknight, false).unwrap();
+        let white_piece = game.board.get_live_piece_with_name(PieceName::Qbishop, true).unwrap();
+        let black_piece = game.board.get_live_piece_with_name(PieceName::Qknight, false).unwrap();
         assert_eq!(white_piece.get_curr_cell().unwrap(), Cell::new("f4"));
         assert_eq!(black_piece.get_curr_cell().unwrap(), Cell::new("c6"));
 
         game.add_move_pair(&Move::parse("e3"), &Move::parse("d5"));
-        let white_piece = game.board.get_piece_with_name(PieceName::Epawn, true).unwrap();
-        let black_piece = game.board.get_piece_with_name(PieceName::Dpawn, false).unwrap();
+        let white_piece = game.board.get_live_piece_with_name(PieceName::Epawn, true).unwrap();
+        let black_piece = game.board.get_live_piece_with_name(PieceName::Dpawn, false).unwrap();
         assert_eq!(white_piece.get_curr_cell().unwrap(), Cell::new("e3"));
         assert_eq!(black_piece.get_curr_cell().unwrap(), Cell::new("d5"));
 
         game.add_move_pair(&Move::parse("Nf3"), &Move::parse("Bf5"));
-        let white_piece = game.board.get_piece_with_name(PieceName::Kknight, true).unwrap();
-        let black_piece = game.board.get_piece_with_name(PieceName::Qbishop, false).unwrap();
+        let white_piece = game.board.get_live_piece_with_name(PieceName::Kknight, true).unwrap();
+        let black_piece = game.board.get_live_piece_with_name(PieceName::Qbishop, false).unwrap();
         assert_eq!(white_piece.get_curr_cell().unwrap(), Cell::new("f3"));
         assert_eq!(black_piece.get_curr_cell().unwrap(), Cell::new("f5"));
 
         game.add_move_pair(&Move::parse("Nbd2"), &Move::parse("e6"));
-        let white_piece = game.board.get_piece_with_name(PieceName::Qknight, true).unwrap();
-        let black_piece = game.board.get_piece_with_name(PieceName::Epawn, false).unwrap();
+        let white_piece = game.board.get_live_piece_with_name(PieceName::Qknight, true).unwrap();
+        let black_piece = game.board.get_live_piece_with_name(PieceName::Epawn, false).unwrap();
         assert_eq!(white_piece.get_curr_cell().unwrap(), Cell::new("d2"));
         assert_eq!(black_piece.get_curr_cell().unwrap(), Cell::new("e6"));
 
         game.add_move_pair(&Move::parse("c3"), &Move::parse("Bd6"));
-        let white_piece = game.board.get_piece_with_name(PieceName::Cpawn, true).unwrap();
-        let black_piece = game.board.get_piece_with_name(PieceName::Kbishop, false).unwrap();
+        let white_piece = game.board.get_live_piece_with_name(PieceName::Cpawn, true).unwrap();
+        let black_piece = game.board.get_live_piece_with_name(PieceName::Kbishop, false).unwrap();
         assert_eq!(white_piece.get_curr_cell().unwrap(), Cell::new("c3"));
         assert_eq!(black_piece.get_curr_cell().unwrap(), Cell::new("d6"));
 
         game.add_move_pair(&Move::parse("Bg5"), &Move::parse("h6"));
-        let white_piece = game.board.get_piece_with_name(PieceName::Qbishop, true).unwrap();
-        let black_piece = game.board.get_piece_with_name(PieceName::Hpawn, false).unwrap();
+        let white_piece = game.board.get_live_piece_with_name(PieceName::Qbishop, true).unwrap();
+        let black_piece = game.board.get_live_piece_with_name(PieceName::Hpawn, false).unwrap();
         assert_eq!(white_piece.get_curr_cell().unwrap(), Cell::new("g5"));
         assert_eq!(black_piece.get_curr_cell().unwrap(), Cell::new("h6"));
 
         game.add_move_pair(&Move::parse("Bh4"), &Move::parse("g5"));
-        let white_piece = game.board.get_piece_with_name(PieceName::Qbishop, true).unwrap();
-        let black_piece = game.board.get_piece_with_name(PieceName::Gpawn, false).unwrap();
+        let white_piece = game.board.get_live_piece_with_name(PieceName::Qbishop, true).unwrap();
+        let black_piece = game.board.get_live_piece_with_name(PieceName::Gpawn, false).unwrap();
         assert_eq!(white_piece.get_curr_cell().unwrap(), Cell::new("h4"));
         assert_eq!(black_piece.get_curr_cell().unwrap(), Cell::new("g5"));
 
         game.add_move_pair(&Move::parse("Bg3"), &Move::parse("Ne4"));
-        let white_piece = game.board.get_piece_with_name(PieceName::Qbishop, true).unwrap();
-        let black_piece = game.board.get_piece_with_name(PieceName::Kknight, false).unwrap();
+        let white_piece = game.board.get_live_piece_with_name(PieceName::Qbishop, true).unwrap();
+        let black_piece = game.board.get_live_piece_with_name(PieceName::Kknight, false).unwrap();
         assert_eq!(white_piece.get_curr_cell().unwrap(), Cell::new("g3"));
         assert_eq!(black_piece.get_curr_cell().unwrap(), Cell::new("e4"));
 
         game.add_move_pair(&Move::parse("Nxe4"), &Move::parse("Bxe4"));
-        match game.board.get_piece_with_name(PieceName::Qknight, true) {
+        match game.board.get_live_piece_with_name(PieceName::Qknight, true) {
             Some(_piece) => panic!("This piece was just taken, did not expect to find it."),
             None => ()
         }
-        let black_piece = game.board.get_piece_with_name(PieceName::Qbishop, false).unwrap();
+        let black_piece = game.board.get_live_piece_with_name(PieceName::Qbishop, false).unwrap();
         assert_eq!(black_piece.get_curr_cell().unwrap(), Cell::new("e4"));
     }
 

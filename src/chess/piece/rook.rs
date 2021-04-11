@@ -16,7 +16,10 @@ impl Piece for Rook {
     fn is_valid_move(&self, board: &Board, the_move: &Move) -> bool {
         let valid_cells = self.get_valid_cells(board);
         return valid_cells.contains(&the_move.cell);
-    }    
+    }
+    fn first_cell(&self) -> Cell {
+        Rook::init_cell(self.is_white(), self.get_name())
+    }
 }
 
 impl Rook {
