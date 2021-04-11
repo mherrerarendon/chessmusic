@@ -162,9 +162,16 @@ impl Board {
     }
 
     pub fn move_piece(&mut self, name: PieceName, white: bool, the_move: &Move) {
-        self.capture_piece_at_cell(&the_move.cell);
-        let piece = self.get_mut_live_piece_with_name(name, white).expect("unable to move piece");
-        piece.move_(the_move);
+        self.capture_piece_at_cell(&the_move.cell);        
+
+        let piece_to_move = self.get_mut_live_piece_with_name(name, white).expect("unable to move piece");
+        piece_to_move.move_(Some(the_move));
+        
+        for piece in self.pieces.iter_mut().filter(|piece| piece.is_live()) {
+            if piece.get_name() != name || piece.is_white() != white {
+                piece.move_(None);
+            }
+        }
     }
 }
 

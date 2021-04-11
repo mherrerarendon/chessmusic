@@ -57,7 +57,7 @@ impl Game {
             }
         }
 
-        return Err("Bad request")?;
+        return Err("Did not find piece")?;
     }
 
     fn add_move(&mut self, white: bool, the_move: &Move) {
@@ -89,7 +89,6 @@ impl Game {
         if black_move.move_type != MoveType::None {
             self.add_move(false, black_move); 
         }
-             
     }
 
     pub fn get_piece_history(&self, name: PieceName, white: bool) -> Vec<Cell> {

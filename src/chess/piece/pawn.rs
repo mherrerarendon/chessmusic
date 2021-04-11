@@ -161,4 +161,19 @@ mod tests {
             None => panic!("Expected to find pawn")
         }
     }
+
+    #[test]
+    fn test_pawn_cell_history() {
+        let mut pawn = Pawn::new(true, PieceName::Epawn);
+        let history = pawn.get_cell_and_capture_history();
+        assert_eq!(history.len(), 1);
+
+        pawn.move_(None);
+        let history = pawn.get_cell_and_capture_history();
+        assert_eq!(history.len(), 2);
+
+        pawn.move_(Some(&Move::new_with_cell_name("e3")));
+        let history = pawn.get_cell_and_capture_history();
+        assert_eq!(history.len(), 3);
+    }
 }
