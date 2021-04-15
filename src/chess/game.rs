@@ -91,6 +91,7 @@ impl Game {
         }
     }
 
+    // Note: does not include starting cell
     pub fn get_piece_history(&self, name: PieceName, white: bool) -> Vec<Cell> {
         let piece = self.board.get_piece_with_name(name, white);
         let cells = piece.get_cell_and_capture_history().iter().map(|(cell, _)| *cell).collect::<Vec<_>>();
@@ -194,7 +195,7 @@ mod tests {
         let game = Game::new_with_moves(&game_moves);
         let white_pawn_history = game.get_piece_history(PieceName::Apawn, true);
         assert_eq!(white_pawn_history.len(), 2);
-        assert_eq!(white_pawn_history[0], Cell {file: 'a', row: 2});
+        assert_eq!(white_pawn_history[0], Cell {file: 'a', row: 3});
         assert_eq!(white_pawn_history[1], Cell {file: 'a', row: 3});
 
         let black_pawn_history = game.get_piece_history(PieceName::Apawn, false);
@@ -286,7 +287,7 @@ mod tests {
                                     Move::parse("Nxe4"), Move::parse("Bxe4")]; // 10
         let game = Game::new_with_moves(&moves);
         let white_q_bishop_history = game.get_piece_history(PieceName::Qbishop, true);
-        assert_eq!(white_q_bishop_history.len(), 11);
+        assert_eq!(white_q_bishop_history.len(), 20);
         assert_eq!(white_q_bishop_history[0], Cell::new("c1"));
         assert_eq!(white_q_bishop_history[1], Cell::new("c1"));
         assert_eq!(white_q_bishop_history[2], Cell::new("f4"));
@@ -294,9 +295,18 @@ mod tests {
         assert_eq!(white_q_bishop_history[4], Cell::new("f4"));
         assert_eq!(white_q_bishop_history[5], Cell::new("f4"));
         assert_eq!(white_q_bishop_history[6], Cell::new("f4"));
-        assert_eq!(white_q_bishop_history[7], Cell::new("g5"));
-        assert_eq!(white_q_bishop_history[8], Cell::new("h4"));
-        assert_eq!(white_q_bishop_history[9], Cell::new("g3"));
-        assert_eq!(white_q_bishop_history[10], Cell::new("g3"));
+        assert_eq!(white_q_bishop_history[7], Cell::new("f4"));
+        assert_eq!(white_q_bishop_history[8], Cell::new("f4"));
+        assert_eq!(white_q_bishop_history[9], Cell::new("f4"));
+        assert_eq!(white_q_bishop_history[10], Cell::new("f4"));
+        assert_eq!(white_q_bishop_history[11], Cell::new("f4"));
+        assert_eq!(white_q_bishop_history[12], Cell::new("g5"));
+        assert_eq!(white_q_bishop_history[13], Cell::new("g5"));
+        assert_eq!(white_q_bishop_history[14], Cell::new("h4"));
+        assert_eq!(white_q_bishop_history[15], Cell::new("h4"));
+        assert_eq!(white_q_bishop_history[16], Cell::new("g3"));
+        assert_eq!(white_q_bishop_history[17], Cell::new("g3"));
+        assert_eq!(white_q_bishop_history[18], Cell::new("g3"));
+        assert_eq!(white_q_bishop_history[19], Cell::new("g3"));
     }
 }

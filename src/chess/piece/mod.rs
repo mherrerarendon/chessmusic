@@ -67,9 +67,11 @@ pub trait Piece {
     fn has_moved(&self) -> bool {self.get_state().has_moved()}
     fn move_(&mut self, the_move: Option<&Move>) {self.get_mut_state().move_(the_move)}
     fn get_move_history(&self) -> &[Option<Move>] {self.get_state().get_move_history()}
+
+    // Note: does not include starting cell
     fn get_cell_and_capture_history(&self) -> Vec<(Cell, bool)> {
-        let mut history = vec![(self.first_cell(), false)];
-        let mut last_cell = history[0].0;
+        let mut history = Vec::new();
+        let mut last_cell = self.first_cell();
         for move_ in self.get_move_history() {
             let mut move_is_capture = false;
             if let Some(move_) = move_ {
