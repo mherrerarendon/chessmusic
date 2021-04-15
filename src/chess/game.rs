@@ -38,7 +38,7 @@ impl Game {
 
     fn get_piece_for_move(&self, white: bool, the_move: &Move) -> Result<PieceName, Box<dyn Error>> {
         let role = the_move.role;
-        let pieces_with_role = self.board.get_pieces_with_role(role, white);
+        let pieces_with_role = self.board.get_live_pieces_with_role(role, white);
         if the_move.file_hint != ' ' {
             let piece = pieces_with_role.iter().filter(|piece| {
                 if let Some(curr_cell) = piece.get_curr_cell() {
@@ -74,7 +74,8 @@ impl Game {
             let name = match self.get_piece_for_move(white, &the_move) {
                 Ok(name) => name,
                 Err(the_error) => {
-                    println!("Failed to get name for {:?} {:?}", white, the_move);
+                    let color = if white {"white"} else {"black"};
+                    println!("Failed to get name for color: {} and move: {:?}", color, the_move);
                     panic!("{}", the_error.to_string());
                 }
             };
@@ -202,6 +203,35 @@ mod tests {
         assert_eq!(black_pawn_history.len(), 2);
         assert_eq!(black_pawn_history[0], Cell {file: 'a', row: 7});
         assert_eq!(black_pawn_history[1], Cell {file: 'a', row: 6});
+    }
+
+    #[test]
+    fn test_captured_pawn_history() {
+        let game_moves = vec![
+            Move::parse("d4"), 
+            Move::parse("e5"), 
+            Move::parse("a3"), 
+            Move::parse("exd4"), // black captures pawn
+            Move::parse("a4"), 
+            Move::parse("d3"), 
+            Move::parse("cxd3"), // white captures pawn
+            Move::parse("h6")];
+
+        let game = Game::new_with_moves(&game_moves);
+        let white_pawn_history = game.get_piece_history(PieceName::Dpawn, true);
+        assert_eq!(white_pawn_history.len(), 3);
+        assert_eq!(white_pawn_history[0], Cell {file: 'd', row: 4});
+        assert_eq!(white_pawn_history[1], Cell {file: 'd', row: 4});
+        assert_eq!(white_pawn_history[2], Cell {file: 'd', row: 4});
+
+        let black_pawn_history = game.get_piece_history(PieceName::Epawn, false);
+        assert_eq!(black_pawn_history.len(), 6);
+        assert_eq!(black_pawn_history[0], Cell {file: 'e', row: 7});
+        assert_eq!(black_pawn_history[1], Cell {file: 'e', row: 5});
+        assert_eq!(black_pawn_history[2], Cell {file: 'e', row: 5});
+        assert_eq!(black_pawn_history[3], Cell {file: 'd', row: 4});
+        assert_eq!(black_pawn_history[4], Cell {file: 'd', row: 4});
+        assert_eq!(black_pawn_history[5], Cell {file: 'd', row: 3});
     }
 
     #[test]

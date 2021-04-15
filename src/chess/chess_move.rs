@@ -3,25 +3,13 @@ use super::cell::Cell;
 
 use std::fmt;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Move {
     pub role: Role,
     pub move_type: MoveType,
     pub file_hint: char,
     check: bool,
     pub cell: Cell
-}
-
-impl fmt::Debug for Move {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Move")
-         .field("role", &self.role)
-         .field("move_type", &self.move_type)
-         .field("file_hint", &self.file_hint)
-         .field("check", &self.check)
-         .field("cell", &self.cell)
-         .finish()
-    }
 }
 
 impl Move {

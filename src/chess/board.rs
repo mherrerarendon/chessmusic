@@ -151,8 +151,12 @@ impl Board {
         self.pieces.iter_mut().find(|piece| piece.get_name() == name && piece.is_white() == white).unwrap()
     }
 
-    pub fn get_pieces_with_role(&self, role: Role, white: bool) -> Vec<&Box<dyn Piece>> {
-        return self.pieces.iter().filter(|piece| piece.get_role() == role && piece.is_white() == white).collect();
+    pub fn get_live_pieces_with_role(&self, role: Role, white: bool) -> Vec<&Box<dyn Piece>> {
+        return self.pieces.iter().filter(|piece| {
+            piece.get_role() == role 
+            && piece.is_white() == white 
+            && piece.get_curr_cell().is_some()
+        }).collect();
     }
 
     fn capture_piece_at_cell(&mut self, cell: &Cell) {
@@ -195,7 +199,7 @@ mod tests {
     #[test]
     fn test_get_white_pawns() {
         let board = Board::new();
-        let white_pawns = board.get_pieces_with_role(Role::Pawn, true);
+        let white_pawns = board.get_live_pieces_with_role(Role::Pawn, true);
         assert_eq!(white_pawns.len(), 8);
         assert_eq!(white_pawns[0].get_role(), Role::Pawn);
         assert!(white_pawns[0].is_white());
@@ -204,7 +208,7 @@ mod tests {
     #[test]
     fn test_get_black_pawns() {
         let board = Board::new();
-        let white_pawns = board.get_pieces_with_role(Role::Pawn, false);
+        let white_pawns = board.get_live_pieces_with_role(Role::Pawn, false);
         assert_eq!(white_pawns.len(), 8);
         assert_eq!(white_pawns[0].get_role(), Role::Pawn);
         assert!(!white_pawns[0].is_white());

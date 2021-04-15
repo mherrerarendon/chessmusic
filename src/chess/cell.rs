@@ -1,19 +1,10 @@
 use std::char;
 use std::fmt;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub struct Cell {
     pub file: char,
     pub row: i32
-}
-
-impl fmt::Debug for Cell {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Point")
-         .field("file", &self.file)
-         .field("row", &self.row)
-         .finish()
-    }
 }
 
 impl Cell {

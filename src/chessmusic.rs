@@ -113,7 +113,7 @@ pub fn play_game(game_str: &str) {
     }
 }
 
-#[cfg(testss)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
